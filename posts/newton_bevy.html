@@ -205,7 +205,7 @@ sizes and initial velocities. When registering our systems, we tell
 the scheduler to ensure that the collision and gravity systems run
 <em>after</em> the move system, but otherwise it can order them however it
 likes.</p>
-<p><a href="https://youtu.be/DYLtT1mbD08">Watch the result here.</a></p>
+<p><a href="https://youtu.be/WWrY1O4BbR8">Watch the result here.</a></p>
 <p>Pretty cool, huh? Yes, they are spontaneously forming rings. That was
 not planned. Interestingly, it doesn’t seem to happen on every run of
 the simulation, so it must be dependent on the initial conditions
@@ -290,7 +290,7 @@ collision checker system):</p>
 <span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>	<span class="op">.</span>add_system(collision_handler_system<span class="op">.</span>after(<span class="st">&quot;collision&quot;</span>))</span>
 <span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>run()<span class="op">;</span></span>
 <span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
-<p><a href="https://youtu.be/WYuXaqt6Iug">Running the simulation again,</a> it works
+<p><a href="https://youtu.be/-EdjXLJpDgU">Running the simulation again,</a> it works
 the same as before (although no lucky rings this time), but now at
 around 34 frames per second (a 1.6x speedup!). As a sanity check, we
 can change <code>collision_system</code>’s reference to the transform component
