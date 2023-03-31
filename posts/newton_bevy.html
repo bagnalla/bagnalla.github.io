@@ -28,9 +28,9 @@
     <section>
         <h1 id="bevys-gift">Bevy’s Gift</h1>
 <p>I recently became aware of a game programming framework for Rust
-called <a href="https://bevyengine.org/">Bevy</a>, which uses a programming model
-called Bevy ECS (Entity Component System) that can supposedly use
-Rust’s type system in a sophisticated way to automatically parallelize
+called <a href="https://bevyengine.org/">Bevy</a> that uses a programming model
+called ECS (Entity Component System). Bevy ECS allegedly uses Rust’s
+type system in a sophisticated way to automatically parallelize
 execution of game logic while avoiding race conditions. The idea of
 ECS has apparently been around for a while (at least as far back as
 2007 <a href="https://en.wikipedia.org/wiki/Entity_component_system#History">according to
@@ -50,7 +50,7 @@ found <a href="https://github.com/bagnalla/newton_bevy">here</a>.</p>
 project in any way. I give no guarantee that the following code is
 idiomatic or even sensible. Everything in this article could be
 wrong. I just wanted to share my experience because I was really
-amazed at how it turned out. There are several demos out there of
+stricken by how it turned out. There are several demos out there of
 n-body simulations using Bevy, but none of them seem to focus on what
 to me is the most interesting part: automatic parallelization.</p>
 <h2 id="ecs">ECS</h2>
