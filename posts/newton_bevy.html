@@ -27,7 +27,7 @@
         
     </section>
     <section>
-        <h1 id="bevys-gift">Bevy’s Gift</h1>
+        <h3 id="bevys-gift">Bevy’s Gift</h3>
 <p>I recently became aware of a game programming framework for Rust
 called <a href="https://bevyengine.org/">Bevy</a> that uses a programming model
 called ECS (Entity Component System). Bevy ECS allegedly uses Rust’s
@@ -52,7 +52,7 @@ project in any way. I give no guarantee that the following code is
 idiomatic or even sensible. Everything in this article could be
 wrong. I just wanted to share my experience because I was really
 stricken by how well it turned out.</p>
-<h2 id="ecs">ECS</h2>
+<h1 id="ecs">ECS</h1>
 <p>First, we need to know the basic concepts of ECS. The <a href="https://bevyengine.org/learn/book/getting-started/ecs/">Bevy
 tutorial</a> says
 the following:</p>
@@ -77,10 +77,10 @@ where things get really interesting, because Bevy can schedule
 systems to run in parallel when it can guarantee the absence of race
 conditions from looking at their types.</p></li>
 </ul>
-<h2 id="n-body-simulation-with-bevy-ecs">N-body Simulation with Bevy ECS</h2>
+<h1 id="n-body-simulation-with-bevy-ecs">N-body Simulation with Bevy ECS</h1>
 <p>Before worrying about parallelization, let’s set up the basic n-body
 simulation.</p>
-<h3 id="components">Components</h3>
+<h2 id="components">Components</h2>
 <p>We start by defining all the components we need:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="at">#[</span>derive<span class="at">(</span>Component<span class="at">)]</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> Velocity(Vec3)<span class="op">;</span></span>
@@ -93,7 +93,7 @@ simulation.</p>
 <p>Each of our body objects will have a <code>Velocity</code> component, a <code>Radius</code>
 component, and a <code>Mass</code> component. Velocity is a vector with three
 <code>f32</code> elements, and radius and mass are both <code>f32</code> scalar values.</p>
-<h3 id="systems">Systems</h3>
+<h2 id="systems">Systems</h2>
 <p>The simulation works by executing the following steps on every frame:</p>
 <ol type="1">
 <li><p>move each body based on its current velocity,</p></li>
@@ -175,7 +175,7 @@ reference to velocity is also mutable, so the two systems could even
 try to write to it at the same time. Bevy’s system scheduler is forced
 to schedule them <em>in sequence</em> because it can’t guarantee the absence
 of race conditions.</p>
-<h3 id="running-the-simulation">Running the Simulation</h3>
+<h2 id="running-the-simulation">Running the Simulation</h2>
 <p>Lastly, we initialize the Bevy engine (including registering our
 systems with the scheduler) and kick off the simulation:</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">fn</span> main() <span class="op">{</span></span>
@@ -213,7 +213,7 @@ velocities). Anyway, the framerate is rather pitiful at around 21 or
 22 frames per second on my machine. We can improve on this by
 reengineering our systems a bit so that Bevy’s scheduler can get away
 with running the collision and gravity systems in parallel.</p>
-<h2 id="exploiting-automatic-parallelism">Exploiting Automatic Parallelism</h2>
+<h1 id="exploiting-automatic-parallelism">Exploiting Automatic Parallelism</h1>
 <p>How can we possibly convince the Bevy scheduler that it’s okay to run
 the collision and gravity systems at the same time, when they both
 require references (both mutable references at that) to the velocity
