@@ -1,10 +1,11 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-bs-theme="dark">
   <head>
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Alex Bagnall - Bevy's Gift</title>
+    <link rel="stylesheet" href="../css/bootstrap.min.css" />
     <link rel="stylesheet" href="../css/default.css" />
     <link rel="stylesheet" href="../css/syntax.css" />
   </head>
@@ -14,7 +15,7 @@
         <a href="../index.html">Alex Bagnall</a>
       </div>
       <nav>
-        <a href="../index.html">About</a>
+        <a href="../index.html">Home</a>
         <a href="../blog.html">Blog</a>
       </nav>
     </header>
@@ -50,9 +51,7 @@ found <a href="https://github.com/bagnalla/newton_bevy">here</a>.</p>
 project in any way. I give no guarantee that the following code is
 idiomatic or even sensible. Everything in this article could be
 wrong. I just wanted to share my experience because I was really
-stricken by how it turned out. There are several demos out there of
-n-body simulations using Bevy, but none of them seem to focus on what
-to me is the most interesting part: automatic parallelization.</p>
+stricken by how well it turned out.</p>
 <h2 id="ecs">ECS</h2>
 <p>First, we need to know the basic concepts of ECS. The <a href="https://bevyengine.org/learn/book/getting-started/ecs/">Bevy
 tutorial</a> says
@@ -62,21 +61,21 @@ the following:</p>
 </blockquote>
 <p>In other words:</p>
 <ul>
-<li><p>Entity - Every game object is an entity with a unique numeric
+<li><p><strong>Entity</strong> - Every game object is an entity with a unique numeric
 identifier. An entity may be nothing more than an identifier, but it
 may also have some associated <em>components</em>.</p></li>
-<li><p>Component - A component is a data field that can be associated with
-an entity, e.g., position (a component of type Vec3 if working in 3D
-space), velocity (also of type Vec3), hit points (integer), mass
-(float), etc.</p></li>
-<li><p>System - A system is a chunk of code that runs once per update cycle
-(i.e., each “frame”) with reference to a specific collection of
-entities. The collection of entities visible to a system is
-specified by a query, where the semantics of the query is determined
-by its type. These queries are where things get really interesting,
-because their type information can be used by Bevy to schedule
+<li><p><strong>Component</strong> - A component is a data field that can be associated
+with an entity, e.g., position (a component of type Vec3 if working
+in 3D space), velocity (also of type Vec3), hit points (integer),
+mass (float), etc.</p></li>
+<li><p><strong>System</strong> - A system is a chunk of code that runs once per update
+cycle (i.e., every “frame”) with reference to a specific collection
+of entities. The entities visible to a system are selected by a
+query, where the semantics of the query (the subset of the world’s
+entities it selects) is determined by the query’s type. This is
+where things get really interesting, because Bevy can schedule
 systems to run in parallel when it can guarantee the absence of race
-conditions from looking at the types of their queries.</p></li>
+conditions from looking at their types.</p></li>
 </ul>
 <h2 id="n-body-simulation-with-bevy-ecs">N-body Simulation with Bevy ECS</h2>
 <p>Before worrying about parallelization, let’s set up the basic n-body
@@ -109,7 +108,7 @@ the number of bodies, so we will be limited in the number of bodies
 the simulation can support (no more than a couple thousand). There are
 <a href="%5B%5D(https://en.wikipedia.org/wiki/Barnes%E2%80%93Hut_simulation)">ways to improve on
 this</a>,
-but we’ll be keeping things simple.</p>
+but we’ll keep things simple.</p>
 <p>We implement a system for each step of the simulation in turn,
 starting with step 1:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">fn</span> move_system(time<span class="op">:</span> Res<span class="op">&lt;</span>Time<span class="op">&gt;,</span></span>
@@ -122,9 +121,9 @@ starting with step 1:</p>
 <code>Transform</code> and a <code>Velocity</code> component, taking a mutable (writeable)
 reference to the transform and an immutable (readonly) reference to
 the velocity. The system’s code simply iterates over all of the
-entities given by the query and updates their positions based on their
-current velocity (scaled by the time elapsed since the previous frame
-to make on-screen velocity independent of framerate).</p>
+entities returned by the query and updates their positions based on
+their current velocity (scaled by the time elapsed since the previous
+frame so that on-screen velocity will be independent of framerate).</p>
 <p>Next up is the system for applying gravitational forces:</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> G<span class="op">:</span> <span class="dt">f32</span> <span class="op">=</span> <span class="dv">1.0</span><span class="op">;</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="kw">fn</span> gravity_system(time<span class="op">:</span> Res<span class="op">&lt;</span>Time<span class="op">&gt;,</span></span>
@@ -140,16 +139,16 @@ to make on-screen velocity independent of framerate).</p>
 <span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>    	<span class="op">}</span></span>
 <span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
 <p>The gravitational constant <code>G</code> is a parameter that controls the
-strength of gravity. The query is similar to that of <code>move_system</code>
-except we also include the <code>Mass</code> component since the effect of
-gravity depends on the mass of the bodies involved, we take a mutable
-reference to the velocity component since we are modifying the
-velocities of bodies, and we take an immutable reference to the
-transform component since we are not changing the positions of
+strength of gravity. The query for <code>gravity_system</code> is similar to that
+of <code>move_system</code> except we also include the <code>Mass</code> component since the
+effect of gravity depends on the mass of the bodies involved. We also
+take a mutable reference to the velocity component since we are
+modifying the velocities of bodies, and we take an immutable reference
+to the transform component since we are not changing the positions of
 bodies. The code iterates over all pairs of bodies and adjusts their
-velocities based via an <a href="https://en.wikipedia.org/wiki/Inverse-square_law">inverse square law of
+velocities via an <a href="https://en.wikipedia.org/wiki/Inverse-square_law">inverse square law of
 attraction</a> based on
-the distance between them and their relative masses.</p>
+the distance between the two bodies and their relative masses.</p>
 <p>Next is the collision system:</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">fn</span> collision_system(<span class="kw">mut</span> query<span class="op">:</span> Query<span class="op">&lt;</span>(<span class="op">&amp;</span><span class="kw">mut</span> Transform<span class="op">,</span> <span class="op">&amp;</span><span class="kw">mut</span> Velocity<span class="op">,</span> <span class="op">&amp;</span>Radius<span class="op">,</span> <span class="op">&amp;</span>Mass)<span class="op">&gt;</span>) <span class="op">{</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">let</span> <span class="kw">mut</span> combinations <span class="op">=</span> query<span class="op">.</span>iter_combinations_mut()<span class="op">;</span></span>
@@ -166,19 +165,19 @@ the distance between them and their relative masses.</p>
 <p>We omit the code for actually handling collisions when they occur
 because it detracts from the main point: the query. The key thing to
 notice about the query is that it takes a reference to the velocity
-component of bodies. The gravity system, if you recall, takes a
-<em>mutable</em> reference to the velocity component. This means,
-unfortunately, that it would be unsafe to execute the gravity and
-collision systems in parallel because there is a potential race
-condition when the gravity system writes to the velocity component at
-the same time that the collision system reads from it. In fact,
-<code>collision_system</code>’s reference to velocity is also mutable, so the two
-systems could even try to write to it at the same time. Bevy’s system
-scheduler is forced to schedule them in sequence because it can’t
-guarantee the absence of race conditions from looking at their types.</p>
-<h3 id="initialization">Initialization</h3>
-<p>Lastly, we need to initialize the Bevy engine (including registering
-our systems with the scheduler) and kick off the simulation:</p>
+component. The gravity system, if you recall, takes a <em>mutable</em>
+reference to the velocity component. This means, unfortunately, that
+it would be unsafe to execute the gravity and collision systems in
+parallel because there is a potential race condition when the gravity
+system writes to the velocity component at the same time that the
+collision system reads from it. In fact, <code>collision_system</code>’s
+reference to velocity is also mutable, so the two systems could even
+try to write to it at the same time. Bevy’s system scheduler is forced
+to schedule them <em>in sequence</em> because it can’t guarantee the absence
+of race conditions.</p>
+<h3 id="running-the-simulation">Running the Simulation</h3>
+<p>Lastly, we initialize the Bevy engine (including registering our
+systems with the scheduler) and kick off the simulation:</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">fn</span> main() <span class="op">{</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    <span class="pp">App::</span>new()</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>insert_resource(Msaa <span class="op">{</span> samples<span class="op">:</span> <span class="dv">4</span> <span class="op">}</span>)</span>
@@ -203,37 +202,36 @@ demonstration. Just know that in <code>setup_bodies</code> we create two large
 smaller bodies (2000 of them) with fixed initial positions but random
 sizes and initial velocities. When registering our systems, we tell
 the scheduler to ensure that the collision and gravity systems run
-<em>after</em> the move system, but otherwise it can order them however it
-likes.</p>
-<p><a href="https://youtu.be/WWrY1O4BbR8">Watch the result here.</a></p>
+<em>after</em> the move system, but otherwise it is free to order them
+however it likes.</p>
+<p><a href="https://youtu.be/FUn7rgH_XCU">Watch the result here.</a></p>
 <p>Pretty cool, huh? Yes, they are spontaneously forming rings. That was
 not planned. Interestingly, it doesn’t seem to happen on every run of
 the simulation, so it must be dependent on the initial conditions
 (remember that the small bodies are given random sizes and initial
-velocities). Anyway, as cool as the simulation is, the framerate is
-far from perfect, at around 21 or 22 frames per second on my
-machine. We can improve on this by reengineering our systems a bit so
-that Bevy’s scheduler can get away with running the collision and
-gravity systems in parallel.</p>
+velocities). Anyway, the framerate is rather pitiful at around 21 or
+22 frames per second on my machine. We can improve on this by
+reengineering our systems a bit so that Bevy’s scheduler can get away
+with running the collision and gravity systems in parallel.</p>
 <h2 id="exploiting-automatic-parallelism">Exploiting Automatic Parallelism</h2>
 <p>How can we possibly convince the Bevy scheduler that it’s okay to run
 the collision and gravity systems at the same time, when they both
 require references (both mutable references at that) to the velocity
 component? Our solution is based on a simple observation: most bodies,
-most of the time, are <em>not</em> colliding with one another (i.e, on most
-frames any given body is not participating in any collision at all,
-and even when it does it is with at most a couple other colliding
-bodies). This means that the mutable reference to the velocity
-component is rarely used in proportion to the total number of
-collision checks that are performed. The number of checks is a
-constant on the order of <code>n^2</code> every frame, whereas the number of
-actual collisions is on average <em>much</em> smaller than that.</p>
-<p>We can remove the reference to the velocity component from the
-collision checking system altogether and have it build a queue of
-collisions to be handled at a later stage, thereby allowing the bulk
-of the work to be performed in parallel with the gravity system. We
-start by defining a struct for collision records to be pushed to the
-queue:</p>
+most of the time, are <em>not</em> colliding with one another (i.e, on each
+frame most bodies are not colliding at all, and when they are, it is
+with only one or two other bodies). This means that the mutable
+reference to the velocity component is rarely used by
+<code>collision_system</code> relative to the total number of collision checks
+that are performed. The number of checks is a constant on the order of
+<code>n²</code> every frame, whereas the number of actual collisions is on
+average <em>much</em> smaller than that.</p>
+<p>We can remove the reference to the velocity component from
+<code>collision_system</code> altogether and have it build a queue of collisions
+to be handled at a later stage, thereby allowing the bulk of the work
+(collision <em>checking</em>) to be performed in parallel with the gravity
+system. We start by defining a struct for collision records to be
+pushed to the queue:</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> Collision(Entity<span class="op">,</span> Entity)<span class="op">;</span></span></code></pre></div>
 <p>Then we remove <code>&amp;mut Velocity</code> from the collision system’s query type
 (and add <code>Entity</code> to include entity IDs and remove <code>Mass</code> because it’s
@@ -264,13 +262,13 @@ then write a new system for handling detected collisions:</p>
 <span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>	<span class="co">// Handle collision</span></span>
 <span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
 <span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
-<p>We could slightly optimize further by including the values of <code>d</code> and
-<code>v</code> in the <code>Collision</code> struct since they are already computed in
-<code>collision_system</code>, but it makes little difference because, as we’ve
+<p>We could slightly optimize by including the values of <code>d</code> and <code>v</code> in
+the <code>Collision</code> struct since they are already computed in
+<code>collision_system</code> but it makes little difference because, as we’ve
 already noted, collisions are relatively rare events.</p>
 <p>Lastly, we update the initialization code to register the Collision
-event and new collision handler system (specified to run <em>after</em> the
-collision checker system):</p>
+event and new collision handler system (specified to run <em>after</em>
+<code>collision_system</code>):</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="kw">fn</span> main() <span class="op">{</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    <span class="pp">App::</span>new()</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>insert_resource(Msaa <span class="op">{</span> samples<span class="op">:</span> <span class="dv">4</span> <span class="op">}</span>)</span>
@@ -290,13 +288,14 @@ collision checker system):</p>
 <span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>	<span class="op">.</span>add_system(collision_handler_system<span class="op">.</span>after(<span class="st">&quot;collision&quot;</span>))</span>
 <span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>        <span class="op">.</span>run()<span class="op">;</span></span>
 <span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
-<p><a href="https://youtu.be/-EdjXLJpDgU">Running the simulation again,</a> it works
-the same as before (although no lucky rings this time), but now at
-around 34 frames per second (a 1.6x speedup!). As a sanity check, we
-can change <code>collision_system</code>’s reference to the transform component
-to be mutable, and we’re right back to where we started at 22 frames
-per second because Bevy can longer run it in parallel with
-<code>gravity_system</code>.</p>
+<p><a href="https://youtu.be/MbDKsG8Fetg">Running the simulation again</a>, we see
+that it works the same as before (although no lucky rings this time),
+but now at around 34 frames per second (a 1.6x speedup!). As a sanity
+check, we can change <code>collision_system</code>’s reference to the transform
+component to be mutable, and we’re right back to where we started at
+22 frames per second because Bevy can longer run it in parallel with
+<code>gravity_system</code> without risking a race condition on the transform
+component.</p>
     </section>
 </article>
 
