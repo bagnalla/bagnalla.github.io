@@ -105,7 +105,7 @@ apply the corresponding acceleration (change of velocity), and</p></li>
 when they occur by adjusting the positions and velocities of the
 affected bodies.</p></li>
 </ol>
-<p>Obviously, the running time of steps 2) and 3) scale quadratically in
+<p>Obviously, the running time of steps 2) and 3) scales quadratically in
 the number of bodies, so we will be limited in the number of bodies
 the simulation can support (no more than a couple thousand). There are
 <a href="https://en.wikipedia.org/wiki/Barnes%E2%80%93Hut_simulation">ways to improve on
@@ -150,7 +150,7 @@ to the transform component since we are not changing the positions of
 bodies. The code iterates over all pairs of bodies and adjusts their
 velocities via an <a href="https://en.wikipedia.org/wiki/Inverse-square_law">inverse square law of
 attraction</a> based on
-the distance between the two bodies and their relative masses.</p>
+the distance between the two bodies and their masses.</p>
 <p>Next is the collision system:</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">fn</span> collision_system(<span class="kw">mut</span> query<span class="op">:</span> Query<span class="op">&lt;</span>(<span class="op">&amp;</span><span class="kw">mut</span> Transform<span class="op">,</span> <span class="op">&amp;</span><span class="kw">mut</span> Velocity<span class="op">,</span> <span class="op">&amp;</span>Radius<span class="op">,</span> <span class="op">&amp;</span>Mass)<span class="op">&gt;</span>) <span class="op">{</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">let</span> <span class="kw">mut</span> combinations <span class="op">=</span> query<span class="op">.</span>iter_combinations_mut()<span class="op">;</span></span>
