@@ -143,8 +143,8 @@ frame so that on-screen velocity will be independent of framerate).</p>
 <p>The gravitational constant <code>G</code> is a parameter that controls the
 strength of gravity. The query for <code>gravity_system</code> is similar to that
 of <code>move_system</code> except we also include the <code>Mass</code> component since the
-effect of gravity depends on the mass of the bodies involved. We also
-take a mutable reference to the velocity component since we are
+effect of gravity depends on the masses of the bodies involved. We
+also take a mutable reference to the velocity component since we are
 modifying the velocities of bodies, and we take an immutable reference
 to the transform component since we are not changing the positions of
 bodies. The code iterates over all pairs of bodies and adjusts their
@@ -209,7 +209,7 @@ however it likes.</p>
 <p><a href="https://youtu.be/aSmiKe4jXhk">Watch the result here.</a></p>
 <p>Pretty cool, huh? Yes, they are spontaneously forming rings. That was
 not planned. Interestingly, it doesn’t seem to happen on every run of
-the simulation, so it must be dependent on the initial conditions
+the simulation, so it must be sensitive to initial conditions
 (remember that the small bodies are given random sizes and initial
 velocities). Anyway, the framerate is rather pitiful at around 21 or
 22 frames per second on my machine. We can improve on this by
