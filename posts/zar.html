@@ -30,16 +30,16 @@
         <!-- ![](../images/dice2.png){ style="display: block; margin-left: 55px; margin-top: 10px; width: 20%" } -->
 <p><img src="../images/dice2.png" style="display: block; margin-left: auto; margin-right: auto; margin-top: 10px; margin-bottom: -10px; width: 20%" /></p>
 <h3 id="rolling-the-bones">Rolling the Bones</h3>
-<p>Suppose you want to roll a 6-sided die but you don’t have one lying
-around. You <em>do</em> have a coin though, which presumably is not biased
-(i.e., it is <em>fair</em>, with equal probability of flipping heads or
-tails). How could you simulate rolls of the die using only the fair
-coin?</p>
 <p>One of the things that came out of my PhD research is a framework
-(part of the overall Zar probabilistic programming system) for
-building samplers for discrete probability distributions (such as the
-6-sided die or, more generally, the n-sided die) with <em>formal proofs
-of correctness</em> in Coq.</p>
+(part of the overall <a href="https://github.com/bagnalla/zar">Zar</a>
+probabilistic programming system) for building samplers for discrete
+probability distributions with <em>formal proofs of correctness</em> in
+Coq. One such example of a discrete distribution is the <em>n-sided die</em>.</p>
+<p>Consider the following hypothetical: Suppose you want to roll a
+6-sided die but you don’t have one lying around. You <em>do</em> have a coin
+though, which presumably is not biased (i.e., it is <em>fair</em>, with equal
+probability of flipping heads or tails). How could you simulate rolls
+of the die using only the fair coin?</p>
 <p>Samplers built with Zar can be thought of as <em>fair coin transformers</em>,
 taking as input a fair coin (represented as a stream of uniformly
 distributed Booleans where <code>true</code> stands for <code>heads</code> and <code>false</code> for
@@ -47,26 +47,26 @@ distributed Booleans where <code>true</code> stands for <code>heads</code> and <
 probability distribution. The proofs of correctness say that as long
 as the input coin is fair, the output samples will indeed be
 distributed according to the intended distribution.</p>
-<p>Although Zar supports sampling from arbitrary discrete distributions
-in general, in this article we’ll focus on uniform sampling (“rolling
-an n-sided die”). We’ll look at the algorithm used by Zar for
-simulating an n-sided die from a fair coin, and then we’ll see how to
+<p>In this article, we’ll look at Zar’s answer to the question of
+simulating an n-sided die using a fair coin, and then we’ll see how to
 use it via the <a href="TODO">Zar OCaml package</a> (and its <a href="TODO">Haskell
-equivalent</a>) to draw samples that are formally proved to be
-uniformly distributed.</p>
-<p>You might think that uniform is trivial and shouldn’t require formal
-verification, but the reality is that bugs in uniform samplers such as
-“modulo bias” are a <a href="https://research.kudelskisecurity.com/2020/07/28/the-definitive-guide-to-modulo-bias-and-how-to-avoid-it/">notorious vulnerability in cryptographic
-systems</a>,
-and as we know from the great Edsger Dijkstra: “Program testing can be
-used to show the presence of bugs, but never to show their absence!”
-The samplers built using Zar come with <em>a priori</em> formal guarantees of
-the accuracy of their output distributions, which for the n-sided die
-means the guaranteed absence of modulo bias.</p>
+equivalent</a>) to generate samples that are formally proved to be
+uniformly distributed. Although Zar supports sampling from arbitrary
+discrete distributions, we’ll just focus on uniform sampling (“rolling
+an n-sided die”) for now.</p>
+<p>You might think that uniform sampling is trivial and shouldn’t require
+formal verification, but the reality is that bugs in uniform samplers
+such as “modulo bias” are a <a href="https://research.kudelskisecurity.com/2020/07/28/the-definitive-guide-to-modulo-bias-and-how-to-avoid-it/">notorious vulnerability in cryptographic
+systems</a>. Rigorous
+testing can only take you so far; to quote Edsger Dijkstra: “Program
+testing can be used to show the presence of bugs, but never to show
+their absence!” The samplers built using Zar come with <em>a priori</em>
+formal guarantees of the accuracy of their output distributions, which
+for the n-sided die means no modulo bias, period.</p>
 <h1 id="simulating-an-n-sided-die">Simulating an N-sided Die</h1>
-<p>Let’s look at a high-level algorithm for simulating an n-sided die. At
-first we’ll consider only the special case of when <code>n</code> is a power of
-<code>2</code>. From there we can generalize to any <code>n &gt; 0</code>.</p>
+<p>First let’s look at a high-level algorithm for simulating an n-sided
+die. We’ll start with the special case of when <code>n</code> is a power of <code>2</code>,
+and from there we can generalize to any <code>n &gt; 0</code>.</p>
 <h2 id="dyadic-dice">Dyadic Dice</h2>
 <p>When <code>n</code> is a power of <code>2</code>, the solution is easy: flip the coin
 <code>lg(n)</code> times and interpret the resulting string of outcomes as the
