@@ -74,11 +74,11 @@ bits of a binary encoded integer, where <code>heads</code> denotes <code>1</code
 <code>tails</code> denotes <code>0</code>. For example, to simulate an 8-sided die (with
 values ranging from <code>0</code> to <code>7</code>), we roll the coin <code>lg(8) = 3</code> times to
 generate a bit sequence such as <code>010</code> (interpreted as the integer <code>2</code>)
-or <code>110</code> (interpreted as <code>6</code>). We can visualize this process as a
+or <code>110</code> (interpreted as <code>6</code>). We can encode this process as a
 complete binary tree where each branch represents a flip of the coin
 and each leaf contains a possible output in the range <code>[0,7)</code>:</p>
-<p>TODO: tree diagram</p>
-<p>By looking at the tree representation we can clearly see that that the
+<p><img src="../images/8die.png" style="display: block; margin-left: auto; margin-right: auto; margin-top: 10px; margin-bottom: 25px; width: 88%" /></p>
+<p>From this representation we can clearly see that that the
 probabilities of all possible outcomes are exactly equal to <code>(1/2)³ = 1/8</code>.</p>
 <h2 id="rejection-sampling">Rejection Sampling</h2>
 <p>But what if <code>n</code> isn’t a power of <code>2</code>? One approach is to flip more
@@ -91,41 +91,41 @@ exceeds <code>n</code> simply throw it away and try again. I.e., implement a
 <li><p>If <code>k &lt; n</code>, accept <code>k</code> as the sample. Otherwise, reject the sample
 and return to step 1.</p></li>
 </ol>
-<p>We’re basically just taking a sampler for the first power of <code>2</code>
-greater than <code>n</code> and wrapping it in a loop that repeats when the
-sample it produces is <code>≥ n</code>. It’s intuitively obvious that all
-accepted samples have equal probability because they have equal
-probabilities under the base sampler inside the loop. We can visualize
-these rejection samplers too as binary trees (though not necessarily
-complete binary trees) where rejected leaves loop back to the
-root. E.g., for a 6-sided die:</p>
-<p>TODO: rejection tree diagram</p>
-<p>You might notice that it’s technically not a
-<a href="https://en.wikipedia.org/wiki/Tree_(data_structure)">tree</a> since it
-contains cycles. However, we can think of it instead as convenient
-notation for the infinite binary tree that repeats a copy of itself
-upon rejection rather than looping around:</p>
-<p>TODO: rejection infinite tree diagram</p>
+<p>We’re basically taking a sampler for the first power of <code>2</code> greater
+than <code>n</code> and wrapping it in a loop that repeats itself when the sample
+it produces is <code>≥ n</code>. All accepted samples have equal probability
+because they are given probabilities by the base sampler inside the
+loop, and rejection doesn’t favor any one of them over the others. We
+can encode these rejection samplers too as binary trees (though not
+necessarily complete binary trees) where rejected leaves loop back to
+the root. E.g., for a 6-sided die:</p>
+<p><img src="../images/6die3.png" style="display: block; margin-left: auto; margin-right: auto; margin-top: 10px; margin-bottom: 25px; width: 80%" /></p>
+<p>Technically speaking, it’s not a
+<a href="https://en.wikipedia.org/wiki/Tree_(data_structure)">tree</a> because it
+contains cycles. However, we can think of the above simply as a
+convenient notation for the binary tree that infinitely repeats a copy
+of itself:</p>
+<p><img src="../images/6die_inf2.png" style="display: block; margin-left: auto; margin-right: auto; margin-top: 10px; margin-bottom: 25px; width: 90%" /></p>
 <p>So it really is a tree (with repeating self-similar structure) as long
 as you allow for infinite trees, which are no problem in a lazy
-language like Haskell and can be encoded using
+language like Haskell and can easily be encoded using
 “<a href="https://en.wikipedia.org/wiki/Thunk">thunks</a>” in non-lazy languages
-or as coinductive types in proof assistants like
+or by coinductive types in proof assistants like
 <a href="https://coq.inria.fr/">Coq</a> and
 <a href="https://wiki.portal.chalmers.se/agda/pmwiki.php">Agda</a>.</p>
-<p>One downside of our move to rejection sampling is that we can no
-longer take termination for granted. The 6-sided die sampler could
-conceivably take the rejection path at every iteration and loop
-forever without ever producing a sample. However, we can see that the
-probability of rejecting <code>n</code> times in a row is <code>(1/4)ⁿ</code>, which tends
-to <code>0</code> as <code>n</code> goes to <code>+∞</code>. Thus, the probability of rejecting
-infinitely many times is <code>0</code>, and the probability of eventually
-terminating after <code>n</code> steps for some <code>n</code> is therefore <code>1</code>. In other
-words, the 6-sided die sampler is an “<a href="https://en.wikipedia.org/wiki/Almost_surely">almost
-surely</a>” terminating
-process, which for our purposes is good enough to ensure practical
-utility. A similar argument applies for any other rejection sampler
-with nonzero probability of accepting the sample at each iteration.</p>
+<p>One downside of our move to rejection sampling is that termination is
+not guaranteed. For example, the 6-sided die sampler conceivably could
+take the rejection path at every iteration and loop forever without
+ever producing a sample. We can see, however, that the probability of
+rejecting <code>n</code> times in a row is <code>(1/4)ⁿ</code>, which tends to <code>0</code> as <code>n</code>
+goes to <code>+∞</code>. Thus, the probability of rejecting infinitely many times
+is <code>0</code>, and by complement the probability of eventually terminating
+after some <code>n</code> steps is <code>1</code>. In other words, the 6-sided die
+terminates “<a href="https://en.wikipedia.org/wiki/Almost_surely">almost
+surely</a>”, which for our
+purposes is good enough to be practically useful. The same argument
+applies for any similar rejection sampler with nonzero probability of
+acceptance.</p>
 <!-- Although it is not guaranteed to terminate in an absolute sense, we -->
 <!-- may say that the sampler "[almost -->
 <!-- surely](https://en.wikipedia.org/wiki/Almost_surely)" terminates, -->
