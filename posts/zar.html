@@ -27,8 +27,7 @@
         
     </section>
     <section>
-        <!-- ![](../images/dice2.png){ style="display: block; margin-left: 55px; margin-top: 10px; width: 20%" } -->
-<p><img src="../images/dice3.png" style="display: block; margin-left: auto; margin-right: auto; margin-top: 10px; margin-bottom: -10px; width: 20%" /></p>
+        <p><img src="../images/dice3.png" style="display: block; margin-left: auto; margin-right: auto; margin-top: 10px; margin-bottom: -10px; width: 20%" /></p>
 <h3 id="rolling-the-bones">Rolling the Bones</h3>
 <p>One of the things that came out of my PhD research is a framework
 (part of the overall <a href="https://github.com/bagnalla/zar">Zar</a>
@@ -56,16 +55,17 @@ the uniform case (“rolling an n-sided die”) for now.</p>
 <p>You might think that uniform sampling is trivial and shouldn’t require
 formal verification, but the reality is that bugs in uniform samplers
 such as “modulo bias” are a <a href="https://research.kudelskisecurity.com/2020/07/28/the-definitive-guide-to-modulo-bias-and-how-to-avoid-it/">notorious vulnerability in cryptographic
-systems</a>. Rigorous
-testing can only take you so far; to quote Edsger Dijkstra: “Program
-testing can be used to show the presence of bugs, but never to show
-their absence!” The samplers built using Zar come with <em>a priori</em>
-formal guarantees of the accuracy of their output distributions, which
-for the n-sided die means no modulo bias, period.</p>
+systems</a>,
+and testing can do little to guarantee their absence. We know from
+Edsger Dijkstra that “program testing can be used to show the presence
+of bugs, but never to show their absence!” The samplers built with
+Zar, on the other hand, come with <em>a priori</em> formal guarantees of the
+accuracy of their output distributions, which in the case of the
+n-sided die means no modulo bias, period.</p>
 <h1 id="simulating-an-n-sided-die">Simulating an N-sided Die</h1>
-<p>First let’s look at a high-level algorithm for simulating an n-sided
-die. We’ll start with the special case of when <code>n</code> is a power of <code>2</code>,
-and from there we can generalize to any <code>n &gt; 0</code>.</p>
+<p>Let’s look at an algorithm for simulating an n-sided die. We’ll start
+with the special case of when <code>n</code> is a power of <code>2</code>, and then
+generalize from that to to any <code>n &gt; 0</code>.</p>
 <h2 id="dyadic-dice">Dyadic Dice</h2>
 <p>When <code>n</code> is a power of <code>2</code>, the solution is easy: flip the coin
 <code>lg(n)</code> times and interpret the resulting string of outcomes as the
@@ -92,18 +92,18 @@ return to step 1.</p></li>
 </ol>
 <p>We’re essentially just creating an m-sided die where <code>m</code> is the the
 first power of <code>2</code> greater than <code>n</code> and wrapping it in a loop that
-repeats when the sample produced is <code>≥ n</code>. All accepted samples have
-equal probability because they are given equal probabilities by the
-base sampler inside the loop and rejection doesn’t incur a bias toward
-any one of them over the others. We can encode rejection samplers too
-as binary trees (though not necessarily complete binary trees) where
-rejections loop back to the root of the tree. E.g., for a 6-sided die:</p>
+repeats when the sample produced is <code>≥ n</code>. We can encode rejection
+samplers too as binary trees (though not necessarily complete binary
+trees) where rejections loop back to the root of the tree. E.g., for a
+6-sided die:</p>
 <p><img src="../images/6die3.png" style="display: block; margin-left: auto; margin-right: auto; margin-top: 10px; margin-bottom: 25px; width: 60%" /></p>
-<p>Technically speaking, it’s not a
-<a href="https://en.wikipedia.org/wiki/Tree_(data_structure)">tree</a> because
-the loopback is a cycle. However, we can think of the above diagram
-simply as a convenient notation for the binary tree that infinitely
-repeats a copy of itself:</p>
+<p>The probability of any <code>k ∈ [0,6)</code> is <code>(1/8) / (3/4)</code> (the
+<em>unnormalized</em> probability <code>1/8</code> of <code>k</code> being produced by the
+underlying dyadic sampler, normalized by the probability of acceptance
+<code>3/4</code>) which is equal to <code>1/6</code>. Technically, the above diagram isn’t
+<a href="https://en.wikipedia.org/wiki/Tree_(data_structure)">tree</a> because it
+contains a cycle. However, we can think of it as a convenient notation
+for the binary tree that infinitely repeats a copy of itself:</p>
 <p><img src="../images/6die_inf2.png" style="display: block; margin-left: auto; margin-right: auto; margin-top: 10px; margin-bottom: 25px; width: 90%" /></p>
 <p>So it really is a tree (with repeating self-similar structure) as long
 as you allow for infinite trees, which are no problem in a lazy
@@ -112,51 +112,21 @@ language like Haskell and can easily be encoded using
 or by coinductive types in proof assistants like
 <a href="https://coq.inria.fr/">Coq</a> and
 <a href="https://wiki.portal.chalmers.se/agda/pmwiki.php">Agda</a>.</p>
-<p>One downside of rejection sampling is that termination is not
+<p>One downside of rejection sampling is that termination isn’t truly
 guaranteed. For example, the 6-sided die sampler conceivably could
 take the rejection path at every iteration and loop forever without
-ever producing a sample. We can observe, however, that the probability
-of rejecting <code>n</code> times in a row is <code>(1/4)ⁿ</code>, which tends to <code>0</code> as <code>n</code>
-goes to <code>+∞</code>. Thus, the probability of rejecting infinitely many times
-is <code>0</code>, and by the complement the probability of eventually
-terminating after some <code>n</code> steps is <code>1</code>. In other words, the 6-sided
-die terminates “<a href="https://en.wikipedia.org/wiki/Almost_surely">almost
+ever producing a sample. That would be rather unlikely,
+though. Indeed, the probability of rejecting <code>n</code> times in a row is
+<code>(1/4)ⁿ</code>, which tends to <code>0</code> as <code>n</code> goes to <code>+∞</code>. Thus, the
+probability of rejecting infinitely many times is <code>0</code>, and by the
+complement the probability of eventually terminating after some <code>n</code>
+steps is <code>1</code>. In other words, the 6-sided die terminates “<a href="https://en.wikipedia.org/wiki/Almost_surely">almost
 surely</a>”, which for our
-purposes is good enough for it to be practically useful. The same
-argument applies for any rejection sampler with constant nonzero
-probability of acceptance.</p>
-<!-- Although it is not guaranteed to terminate in an absolute sense, we -->
-<!-- may say that the sampler "[almost -->
-<!-- surely](https://en.wikipedia.org/wiki/Almost_surely)" terminates, -->
-<!-- which for our purposes is good enough. A similar argument applies for -->
-<!-- any other rejection sampler that has a nonzero probability of -->
-<!-- accepting the sample at each iteration. -->
+purposes is good enough for it to be practically useful.</p>
+<!-- The same -->
+<!-- argument applies for any rejection sampler with nonzero probability of -->
+<!-- acceptance. -->
 <h1 id="the-zar-ocaml-package">The Zar OCaml Package</h1>
-<!-- [Zar](https://github.com/bagnalla/zar) (Bulgarian for "dice") is a -->
-<!-- probabilistic programming system implemented in the -->
-<!-- [Coq](https://coq.inria.fr/) proof assistant. For the uninitiated: Coq is a programming  -->
-<!-- is a combined proving and programming programming system -->
-<!-- We won't get into any of -->
-<!-- the technical details of the Coq implementation here (see the -->
-<!-- [Zar](https://github.com/bagnalla/zar) repo if interested). -->
-<!-- For the uninitiated: Coq -->
-<!-- is a functional programming language with a type system so expressive -->
-<!-- that complex mathematical specifications of program behavior can be -->
-<!-- encoded as types. The correctness of code written in Coq can thus be -->
-<!-- "proved" by convincing the typechecker that a given program is -->
-<!-- well-typed according to the desired specification. We won't get into -->
-<!-- the technical details of any of Coq proofs here, but you can check -->
-<!-- them out in the [Zar](https://github.com/bagnalla/zar) repo. -->
-<!-- Another one of Coq's features is *extraction*: programs verified in -->
-<!-- Coq can be extracted to equivalent OCaml (or Haskell) code for -->
-<!-- execution. In the rest of this article we'll play around with an OCaml -->
-<!-- package (available on opam -->
-<!-- [here](https://opam.ocaml.org/packages/zar/)) for using verified -->
-<!-- samplers extracted from Coq such as the n-sided die among -->
-<!-- others. We'll be brief here, but the package -->
-<!-- [README](https://github.com/bagnalla/ocamlzar#readme) contains a more -->
-<!-- thorough explanation of its features and proofs of correctness. -->
-<!-- ## Zar for OCaml -->
 <p>The <a href="https://opam.ocaml.org/packages/zar/">Zar OCaml package</a> provides
 a simple wrapper API around formally verified samplers extracted from
 Coq. The easiest way to get it is through opam:</p>
@@ -170,7 +140,7 @@ dune project containing the code in this article can be found
 <a href="https://ocaml.org/p/streaming/0.8.0/doc/index.html">streaming</a> looks
 promising), Zar defines its own stream type with the following
 interface (from
-<a href="https://github.com/bagnalla/ocamlzar/blob/main/lib/zar.mli">zar.mli</a>):</p>
+<a href="https://github.com/bagnalla/ocamlzar/blob/main/lib/stream.mli">stream.mli</a>):</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode ocaml"><code class="sourceCode ocaml"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">(** Streams / Lazy infinite lists. *)</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> 'a stream =</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  | SCons <span class="kw">of</span> 'a * (<span class="dt">unit</span> -&gt; 'a stream)</span>
@@ -199,26 +169,25 @@ is therefore given by <code>die_transformer</code>:</p>
 <p>For any <code>n &gt; 0</code>, <code>die_transformer n</code> is a function that transforms a
 stream of fair coin flips into a stream of n-sided die rolls. To start
 rolling the die, we just need to apply the transformer to an
-appropriate source. Zar contains a default source of fair coin flips
+appropriate source. Zar provides a default source of fair coin flips
 built on OCaml’s <code>Random</code> module:</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode ocaml"><code class="sourceCode ocaml"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co">(** Default uniformly distributed random bit stream. *)</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="kw">val</span> bits : <span class="dt">unit</span> -&gt; <span class="dt">bool</span> stream</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="co">(** Initialize PRNG used for default bit stream. *)</span></span>
 <span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="kw">val</span> seed : <span class="dt">unit</span> -&gt; <span class="dt">unit</span></span></code></pre></div>
-<p>By applying <code>die_transformer 6</code> to <code>bits ()</code>, the following code
-generates a list of 10 rolls of a 6-sided die:</p>
+<p>The following code generates a list of 10 rolls of a 6-sided die by
+applying <code>die_transformer 6</code> to <code>bits ()</code>:</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode ocaml"><code class="sourceCode ocaml"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> die = Zar.die_transformer <span class="dv">6</span> @@ Zar.bits () <span class="kw">in</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> samples = Zar.take <span class="dv">10</span> die <span class="kw">in</span></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co">(* Do something with samples *)</span></span></code></pre></div>
-<p>Or, the following equivalent shortcut for using the default source of
-coin flips:</p>
+<p>The shortcut function <code>die</code> composes <code>die_transformer</code> with <code>bits</code>:</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode ocaml"><code class="sourceCode ocaml"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> samples = Zar.take <span class="dv">10</span> (Zar.die <span class="dv">6</span>) <span class="kw">in</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co">(* Do something with samples *)</span></span></code></pre></div>
-<p>The Zar package supports not only n-sided dice but also biased coins
-and arbitrary finite distributions specified by lists of weights. You
-can learn more about them in the package
-<a href="https://github.com/bagnalla/ocamlzar#readme">README</a>.</p>
+<p>The Zar OCaml package supports not only n-sided dice but also biased
+coins and general finite distributions specified by lists of weights,
+all formally verified in Coq. You can learn more about them in the
+package <a href="https://github.com/bagnalla/ocamlzar#readme">README</a>.</p>
     </section>
 </article>
 
