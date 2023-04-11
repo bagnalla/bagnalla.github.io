@@ -47,13 +47,12 @@ distributed Booleans where <code>true</code> stands for <code>heads</code> and <
 probability distribution. The proofs of correctness say that as long
 as the input coin is fair, the output samples will indeed be
 distributed according to the intended distribution.</p>
-<p>In this article, we’ll look at Zar’s answer to the question of
-simulating an n-sided die using a fair coin, and then we’ll see how to
-use it via the <a href="TODO">Zar OCaml package</a> (and its <a href="TODO">Haskell
-equivalent</a>) to generate samples that are formally proved to be
-uniformly distributed. Although Zar supports sampling from arbitrary
-discrete distributions, we’ll just focus on uniform sampling (“rolling
-an n-sided die”) for now.</p>
+<p>In this article, we look at how Zar simulates an n-sided die from a
+fair coin, and how to use the <a href="https://github.com/bagnalla/ocamlzar">Zar OCaml
+package</a> to generate samples
+that are formally proved to be uniformly distributed. Zar supports
+sampling from more than just uniform distributions, but we’ll focus on
+the uniform case (“rolling an n-sided die”) for now.</p>
 <p>You might think that uniform sampling is trivial and shouldn’t require
 formal verification, but the reality is that bugs in uniform samplers
 such as “modulo bias” are a <a href="https://research.kudelskisecurity.com/2020/07/28/the-definitive-guide-to-modulo-bias-and-how-to-avoid-it/">notorious vulnerability in cryptographic
@@ -77,9 +76,9 @@ generate a bit sequence such as <code>010</code> (interpreted as the integer <co
 or <code>110</code> (interpreted as <code>6</code>). We can encode this process as a
 complete binary tree where each branch represents a flip of the coin
 and each leaf contains a possible output in the range <code>[0,7)</code>:</p>
-<p><img src="../images/8die.png" style="display: block; margin-left: auto; margin-right: auto; margin-top: 10px; margin-bottom: 25px; width: 88%" /></p>
-<p>From this representation we can clearly see that that the
-probabilities of all possible outcomes are exactly equal to <code>(1/2)³ = 1/8</code>.</p>
+<p><img src="../images/8die.png" style="display: block; margin-left: auto; margin-right: auto; margin-top: 10px; margin-bottom: 25px; width: 66%" /></p>
+<p>From this representation we clearly see that all possible values in
+the range <code>[0,7)</code> have probability exactly equal to <code>(1/2)³ = 1/8</code>.</p>
 <h2 id="rejection-sampling">Rejection Sampling</h2>
 <p>But what if <code>n</code> isn’t a power of <code>2</code>? One approach is to flip more
 bits than are actually needed, and whenever the resulting sample
@@ -88,23 +87,23 @@ exceeds <code>n</code> simply throw it away and try again. I.e., implement a
 <ol type="1">
 <li><p>Flip <code>lg(n)+1</code> bits to obtain a bit sequence representing integer
 <code>k</code>.</p></li>
-<li><p>If <code>k &lt; n</code>, accept <code>k</code> as the sample. Otherwise, reject the sample
-and return to step 1.</p></li>
+<li><p>If <code>k &lt; n</code>, accept <code>k</code> as the sample. Otherwise, reject <code>k</code> and
+return to step 1.</p></li>
 </ol>
-<p>We’re basically taking a sampler for the first power of <code>2</code> greater
-than <code>n</code> and wrapping it in a loop that repeats itself when the sample
-it produces is <code>≥ n</code>. All accepted samples have equal probability
-because they are given probabilities by the base sampler inside the
-loop, and rejection doesn’t favor any one of them over the others. We
-can encode these rejection samplers too as binary trees (though not
-necessarily complete binary trees) where rejected leaves loop back to
-the root. E.g., for a 6-sided die:</p>
-<p><img src="../images/6die3.png" style="display: block; margin-left: auto; margin-right: auto; margin-top: 10px; margin-bottom: 25px; width: 80%" /></p>
+<p>We’re essentially just creating an m-sided die where <code>m</code> is the the
+first power of <code>2</code> greater than <code>n</code> and wrapping it in a loop that
+repeats when the sample produced is <code>≥ n</code>. All accepted samples have
+equal probability because they are given equal probabilities by the
+base sampler inside the loop and rejection doesn’t incur a bias toward
+any one of them over the others. We can encode rejection samplers too
+as binary trees (though not necessarily complete binary trees) where
+rejections loop back to the root of the tree. E.g., for a 6-sided die:</p>
+<p><img src="../images/6die3.png" style="display: block; margin-left: auto; margin-right: auto; margin-top: 10px; margin-bottom: 25px; width: 60%" /></p>
 <p>Technically speaking, it’s not a
-<a href="https://en.wikipedia.org/wiki/Tree_(data_structure)">tree</a> because it
-contains cycles. However, we can think of the above simply as a
-convenient notation for the binary tree that infinitely repeats a copy
-of itself:</p>
+<a href="https://en.wikipedia.org/wiki/Tree_(data_structure)">tree</a> because
+the loopback is a cycle. However, we can think of the above diagram
+simply as a convenient notation for the binary tree that infinitely
+repeats a copy of itself:</p>
 <p><img src="../images/6die_inf2.png" style="display: block; margin-left: auto; margin-right: auto; margin-top: 10px; margin-bottom: 25px; width: 90%" /></p>
 <p>So it really is a tree (with repeating self-similar structure) as long
 as you allow for infinite trees, which are no problem in a lazy
@@ -113,19 +112,19 @@ language like Haskell and can easily be encoded using
 or by coinductive types in proof assistants like
 <a href="https://coq.inria.fr/">Coq</a> and
 <a href="https://wiki.portal.chalmers.se/agda/pmwiki.php">Agda</a>.</p>
-<p>One downside of our move to rejection sampling is that termination is
-not guaranteed. For example, the 6-sided die sampler conceivably could
+<p>One downside of rejection sampling is that termination is not
+guaranteed. For example, the 6-sided die sampler conceivably could
 take the rejection path at every iteration and loop forever without
-ever producing a sample. We can see, however, that the probability of
-rejecting <code>n</code> times in a row is <code>(1/4)ⁿ</code>, which tends to <code>0</code> as <code>n</code>
+ever producing a sample. We can observe, however, that the probability
+of rejecting <code>n</code> times in a row is <code>(1/4)ⁿ</code>, which tends to <code>0</code> as <code>n</code>
 goes to <code>+∞</code>. Thus, the probability of rejecting infinitely many times
-is <code>0</code>, and by complement the probability of eventually terminating
-after some <code>n</code> steps is <code>1</code>. In other words, the 6-sided die
-terminates “<a href="https://en.wikipedia.org/wiki/Almost_surely">almost
+is <code>0</code>, and by the complement the probability of eventually
+terminating after some <code>n</code> steps is <code>1</code>. In other words, the 6-sided
+die terminates “<a href="https://en.wikipedia.org/wiki/Almost_surely">almost
 surely</a>”, which for our
-purposes is good enough to be practically useful. The same argument
-applies for any similar rejection sampler with nonzero probability of
-acceptance.</p>
+purposes is good enough for it to be practically useful. The same
+argument applies for any rejection sampler with constant nonzero
+probability of acceptance.</p>
 <!-- Although it is not guaranteed to terminate in an absolute sense, we -->
 <!-- may say that the sampler "[almost -->
 <!-- surely](https://en.wikipedia.org/wiki/Almost_surely)" terminates, -->
@@ -164,7 +163,8 @@ Coq. The easiest way to get it is through opam:</p>
 <pre><code>opam install zar</code></pre>
 <p>Once installed, you can simply list <code>zar</code> as a dependency in your dune
 project to gain access to everything in the <code>Zar</code> namespace. A sample
-project containing the code in this article can be found <a href="TODO">here</a>.</p>
+dune project containing the code in this article can be found
+<a href="https://github.com/bagnalla/ocamlzar-example">here</a>.</p>
 <p>Since there doesn’t seem to be a standard streaming library for OCaml
 (although
 <a href="https://ocaml.org/p/streaming/0.8.0/doc/index.html">streaming</a> looks
