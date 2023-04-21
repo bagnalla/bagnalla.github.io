@@ -39,15 +39,16 @@
 <h3 id="death-and-the-egg">Death and the Egg</h3>
 <p>One of the many troubling aspects of Darwinism is that it seems to
 imply that all biological organisms (humans included) are
-instinctively selfish. Self-sacrificing traits don’t confer adaptive
-advantage (i.e. reproductive success) to the individuals who possess
-them. On the contrary, self-serving behavior does tend to improve
-reproductive success. Therefore we should expect to find no shortage
-of selfish traits among the extant members of a given species, and we
-ought to be surprised when we find altruistic traits. However, we all
-know from everyday experience (and examples from nature such as the
-social insects) that individuals do often act in selfless ways for the
-benefit of others. Does that mean that Darwinism is wrong?</p>
+instinctively selfish. A self-sacrificing trait doesn’t confer
+adaptive advantage (i.e., enhanced reproductive success) to the
+individuals who possesses it. On the contrary, self-serving behavior
+does tend to improve reproductive success. Therefore we should expect
+to find no shortage of selfish traits among the extant members of a
+given species, and we ought to be surprised when we find altruistic
+traits. However, we all know from everyday experience (and examples
+from nature such as the social insects) that individuals do often act
+in selfless ways for the benefit of others. Does that mean that
+Darwinism is wrong?</p>
 <p><strong>Note</strong>: The videos in this article may not display correctly in
 Firefox. They should work in Chromium based browsers (e.g., Chrome,
 Brave).</p>
@@ -75,9 +76,9 @@ selection may act at the level of groups (e.g., races or species) to
 optimize for individual characteristics that serve “for the good of
 the group”. For example, it might be said that the female honeybee
 (who dies a gruesome death after using her stinger) sacrifices herself
-for the good of the colony, or that male chimpanzees submits to the
+for the good of the colony, or that male chimpanzees submit to a
 dominant male for the sake of peace within the group rather than
-fighting to the death for the right to mate with the females.</p>
+fighting to the death for the right to mate.</p>
 <p>Dawkins spills a fair amount of ink arguing that group selection is
 not the right way to think about evolution (and from what I understand
 he is far from being alone on this issue). He insists that natural
@@ -110,11 +111,11 @@ visual acuity and cognitive ability needed to recognize them. It may
 even induce additional costs in terms of energy use. A simpler (and
 more altruistic) strategy would be to not discriminate between eggs at
 all and to incubate whatever eggs are lying around. The downside to
-the altruistic strategy is negligible as long as most of the other
-guillemots are also doing it. From a group-selectionist point of view
-we might expect the altruistic strategy to dominate since selfishness
-doesn’t benefit the species as a whole and perhaps is even moderately
-harmful.</p>
+the altruistic strategy would be negligible as long as most of the
+other guillemots are also doing it. From a group-selectionist point of
+view we might expect the altruistic strategy to dominate since
+selfishness doesn’t benefit the species as a whole and is perhaps even
+moderately harmful.</p>
 <p>We can investigate by simulating natural selection of brooding
 strategies in a population of guillemots. We’ll implement the
 simulation in <a href="https://bevyengine.org/">bevy</a>, a game engine for
@@ -129,9 +130,9 @@ those mutations. We’ll begin by looking at three basic types of
 brooding strategies modelled in the simulation.</p>
 <h2 id="the-altruist">The Altruist</h2>
 <p><img src="../images/altruist.png" style="display: block; margin-left: auto; margin-right: auto; margin-top: 10px; margin-bottom: 0px; width: 20%" /></p>
-<p>Meet the altruist. She wanders around aimlessly, occasionally laying
-an egg. After laying an egg, she continues to wander and may continue
-to lay more eggs. Whenever her path happens to cross with an egg she
+<p>The altruist wanders around aimlessly, occasionally laying an
+egg. After laying an egg, she continues to wander and may continue to
+lay more eggs. Whenever her path happens to cross with an egg she
 always (whether it is her egg or not) sit and incubates the egg until
 it hatches into a new guillemot.</p>
 <p>A population of altruists is able to thrive quite well by
@@ -151,37 +152,36 @@ strategy, perhaps due to some genetic tradeoff for the required
 adaptations (e.g., egg markings and visual acuity), or perhaps due to
 the additional stress of worrying about one’s own egg, or whatever
 else it might be. We’ll model the cost of selfishness in our
-simulation as a 1.3x multiplier on the rate of aging, giving selfish
-guillemots significantly shorter lifespans on average than their
-altruistic cousins.</p>
+simulation as a 1.3x multiplier on the rate of aging, causing selfish
+guillemots to have significantly shorter lifespans on average than
+their altruistic cousins.</p>
 <p>Altruistic and selfish guillemots can coexist peacefully in a brooding
 community provided that the altruists are numerous enough to support
 their own subset of the population:</p>
 <p><video src="../videos/altruist_selfish1.mkv" controls><a href="../videos/altruist_selfish1.mkv">Video</a></video></p>
 <p>Selfishness is a reliable way of ensuring the survival of one’s own
 offspring, but altruism seems to be the better strategy overall due to
-longer the longer average lifespan of altruists. All seems well –
-what could possibly go wrong?</p>
+the longer average lifespan of altruists. All seems well – what could
+possibly go wrong?</p>
 <h2 id="the-cheat">The Cheat</h2>
 <p><img src="../images/cheater.png" style="display: block; margin-left: auto; margin-right: auto; margin-top: 10px; margin-bottom: 0px; width: 20%" /></p>
 <p>The cheat wanders and lays eggs exactly like an altruist, but she
 never actually incubates any eggs that she encounters. She simply
 continues to lay eggs for her entire life, relying solely on the
-generosity of the altruist community for incubating them. It’s
-important to note that the cheat isn’t necessarily aware of fact that
-she is “cheating”. She just happens to have stumbled upon an
-unconscious strategy (presumably due to some genetic mutation) that is
-profitable in an environment rich with altruism. Moreover, there is
-little cost for adopting the cheater strategy because, unlike
-selfishness, it doesn’t require any special adaptations. The cheat
-could just be an altruist who has “forgotten” how to incubate.</p>
+generosity of altruists for incubating them. It’s important to note
+that the cheat isn’t necessarily aware of fact that she is
+“cheating”. She just happens to have stumbled upon an unconscious
+strategy (presumably due to some genetic mutation) that performs well
+in an environment rich with altruism. Moreover, there is little cost
+for adopting the cheater strategy because, unlike selfishness, it
+doesn’t require any special adaptations. The cheat could just be an
+altruist who has “forgotten” how to incubate.</p>
 <p>A population containing only altruists and cheats tends to balance out
 at an optimal ratio of approximately 1:1 altruists to cheats:</p>
 <p><video src="../videos/altruist_cheat1.mkv" controls><a href="../videos/altruist_cheat1.mkv">Video</a></video></p>
-<p>But something interesting happens when selfish strategies are
-introduced into the mix. This is what we will investigate with the
-simulation. But first, let’s see how the simulation models genes and
-reproduction.</p>
+<p>But something interesting happens when selfishness is introduced into
+the mix. This is what we will investigate with the simulation. But
+first, let’s see how the simulation models genes and reproduction.</p>
 <h2 id="the-genes">The Genes</h2>
 <p>Every guillemot carries a set of “genes” that influences their choice
 of brooding strategy. We model these genes as a probability
@@ -208,12 +208,12 @@ determined by its genes.</p>
 <span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
 <span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
 <p>In the real world, a guillemot chick inherits a mixture of the genes
-of its two parents. We use a simplified model of reproduction instead
+of its two parents. We instead use a simplified model of reproduction
 where a single parent endows her eggs with slightly mutated copies of
 her own genes (thereby sidestepping issues like <a href="https://en.wikipedia.org/wiki/Blending_inheritance">blending
 inheritance</a>). Genes
-are mutated by applying a small additive noise to each gene component
-and renormalizing to sum to 1:</p>
+are mutated by applying a small additive Gaussian noise to each gene
+component and then renormalizing to sum to 1:</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">fn</span> mutate(Genes(genes)<span class="op">:</span> <span class="op">&amp;</span>Genes<span class="op">,</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>	  rng<span class="op">:</span> <span class="op">&amp;</span><span class="kw">mut</span> ThreadRng<span class="op">,</span></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>	  gauss<span class="op">:</span> <span class="pp">rand_distr::</span>Normal<span class="op">&lt;</span><span class="dt">f32</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> Genes <span class="op">{</span></span>
@@ -222,8 +222,8 @@ and renormalizing to sum to 1:</p>
 <span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    <span class="kw">let</span> z <span class="op">=</span> <span class="dt">f32</span><span class="pp">::</span>max(<span class="dv">0.0</span><span class="op">,</span> genes<span class="op">.</span>z <span class="op">+</span> gauss<span class="op">.</span>sample(rng))<span class="op">;</span></span>
 <span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    Genes(<span class="pp">Vec3::</span>new(x<span class="op">,</span> y<span class="op">,</span> z) <span class="op">/</span> (x <span class="op">+</span> y <span class="op">+</span> z))</span>
 <span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
-<p>For the examples in this article we choose <code>gauss</code> to be a normal
-distribution centered at <code>0</code> with standard deviation <code>0.01</code>.</p>
+<p>For this article we let <code>gauss</code> be a normal distribution centered at
+<code>0</code> with standard deviation <code>0.01</code>.</p>
 <h2 id="the-simulation">The Simulation</h2>
 <p>The brooding area is a square grid of discrete locations. The
 simulation proceeds in discrete “ticks”, executing the following steps
@@ -272,24 +272,25 @@ cheats.</p>
 <p>We should expect a strategy to dominate only if it is an
 <em>evolutionarily stable strategy</em> (ESS). A strategy is said to be an
 ESS when, given that the entire population has already adopted the
-strategy, no individual can benefit by deviating from it. ESS’s are
-roughly analogous to <a href="https://en.wikipedia.org/wiki/Nash_equilibrium">Nash
-equilibria</a> from game
-theory. Being an ESS is not sufficient to guarantee adoption by a
-given population, but it is a necessary condition. A strategy must be
-an ESS to have any chance of gaining widespread and lasting adoptance.</p>
+strategy, no individual can improve their expected reproductive
+success by deviating from it. ESS’s are roughly analogous to <a href="https://en.wikipedia.org/wiki/Nash_equilibrium">Nash
+equilibria</a>. Being an
+ESS is not sufficient to guarantee adoption by a given population, but
+it is necessary. That is, a strategy must be an ESS to have any chance
+of gaining widespread and lasting adoptance by any population under
+the effects of natural selection.</p>
 <p>The selfish brooding strategy is an ESS. If the entire guillemot
 population is selfish, no individual guillemot can benefit (in terms
 of reproductive success) by switching to a different strategy. This is
-because altruism and cheating are viable strategies only when many
-altruists already exist. We can confirm that selfishness is an ESS by
-simulating a purely selfish population of guillemots (setting their
-genes to give probability <code>1</code> to the selfish strategy), and increasing
-the scale and speed of the simulation:</p>
+because altruism and cheating are only viable when many altruists
+already exist. We can confirm that selfishness is an ESS by simulating
+a purely selfish population of guillemots (setting their genes to give
+probability <code>1</code> to the selfish strategy), and increasing the scale and
+speed of the simulation:</p>
 <p><video src="../videos/selfish2.mkv" controls><a href="../videos/selfish2.mkv">Video</a></video></p>
 <p>We see an altruist or cheat pop up here and there due to random
 mutations, but selfishness persists as the dominant strategy for the
-vast majority of guillemots.</p>
+vast majority.</p>
 <p>Cheating, on the other hand, is not an ESS. In a population full of
 cheaters an individual guillemot’s expected reproductive reward is
 nil. It can do better by switching to either altruism (where it will
@@ -311,36 +312,25 @@ happening in our simulation is convergence to a stable gene
 configuration that assigns <code>1/2</code> probability to altruism and <code>1/2</code>
 probability to cheating. From the genes’ point of view, the “strategy”
 is actually a probability distribution over <code>Strategy</code>s (i.e., a mixed
-strategy). The ESS here is actually a mixed strategy between altruism
-and cheating, and when we said earlier that selfishness is an ESS what
-we really meant is that the gene configuration that assigns
-probability <code>1</code> to the selfish <code>Strategy</code> is an ESS. ESS’s actually
-correspond not to <em>pure</em> nash equilibria in the evolutionary “game”
-being played, but rather to <em>mixed Nash equilibria</em> (where “mixed”
-means a probability distribution over a set of possible “pure”
-strategies). The cool thing about mixed equilibria is that <a href="https://en.wikipedia.org/wiki/Nash_equilibrium#Nash's_existence_theorem">they
-always
+strategy). The ESS here is a mixed strategy between altruism and
+cheating. And when we said earlier that selfishness is an ESS, what we
+really meant is that the gene configuration that assigns probability
+<code>1</code> to the selfish <code>Strategy</code> is an ESS. It turns out that ESS’s
+correspond not to <em>pure</em> nash equilibria but rather to <em>mixed Nash
+equilibria</em> (where “mixed” means a probability distribution over a set
+of possible “pure” strategies). The cool thing about mixed equilibria
+is that, unlike pure equilibria, <a href="https://en.wikipedia.org/wiki/Nash_equilibrium#Nash's_existence_theorem">they always
 exist</a>,
 and so too do ESS’s.</p>
 <p>So what happens when we allow for selfishness? Let’s enable selfish
 mutations and restart the simulation, again with an initial population
 of pure altruists:</p>
 <p><video src="../videos/selfish_ess.mkv" controls><a href="../videos/selfish_ess.mkv">Video</a></video></p>
-<p>Initial mutations toward selfishness and cheating quickly proliferate,
-leading eventually to the extinction of the altruists and ultimately
-also of the cheats, leaving selfishness alone as the overwhelmingly
-dominant strategy. It’s worth emphasizing that the guillemots are not
-consciously deciding to become selfish. Rather, natural selection on
-generations has built into them an unconscious rule of thumb (combined
-with the necessary physical adaptations) for acting selfishly.</p>
-<p>It seems then that the problem with group selection is that natural
-selection within groups tends to undermine any altruistic conspiracies
-that would require the honest cooperation of everyone involved. It
-isn’t that selection wouldn’t favor groups with such behaviors over
-their competitors, but rather that it isn’t really possible for those
-behaviors to develop in the first place when they aren’t
-evolutionarily stable at the level of the fundamental units of
-heredity pulling the strings – the genes.</p>
+<p>We should remember that the guillemots are not consciously deciding to
+become selfish. Rather, natural selection on generations builds into
+them an unconscious rule of thumb (together with the necessary
+physical adaptations) for following the evolutionarily stable
+strategy.</p>
     </section>
 </article>
 
