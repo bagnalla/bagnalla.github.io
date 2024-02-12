@@ -23,7 +23,7 @@
         <a href="../index.html">Alex Bagnall</a>
       </div>
       <nav>
-	<a href="https://bagnalla.github.io/CV/AAB_CV.pdf">CV</a>
+	<!-- <a href="https://bagnalla.github.io/CV/AAB_CV.pdf">CV</a> -->
         <a href="../index.html">Home</a>
         <a href="../blog.html">Blog</a>
       </nav>
@@ -65,10 +65,8 @@ the uniform case (“rolling an n-sided die”) for now.</p>
 formal verification, but the reality is that bugs in uniform samplers
 such as “modulo bias” are a <a href="https://research.kudelskisecurity.com/2020/07/28/the-definitive-guide-to-modulo-bias-and-how-to-avoid-it/">notorious vulnerability in cryptographic
 systems</a>,
-and testing can do little to guarantee their absence. We know from
-Edsger Dijkstra that “program testing can be used to show the presence
-of bugs, but never to show their absence!” The samplers built with
-Zar, on the other hand, come with <em>a priori</em> formal guarantees of the
+and no amount of testing can ever guarantee their absence. The
+samplers built with Zar come with <em>a priori</em> formal guarantees of the
 accuracy of their output distributions, which in the case of the
 n-sided die means no modulo bias, period.</p>
 <h1 id="simulating-an-n-sided-die">Simulating an N-sided Die</h1>
@@ -110,9 +108,9 @@ trees) where rejections loop back to the root of the tree. E.g., for a
 <em>unnormalized</em> probability <code>1/8</code> of <code>k</code> being produced by the
 underlying dyadic sampler, normalized by the probability of acceptance
 <code>3/4</code>) which is equal to <code>1/6</code>. Technically, the above diagram isn’t
-<a href="https://en.wikipedia.org/wiki/Tree_(data_structure)">tree</a> because it
-contains a cycle. However, we can think of it as a convenient notation
-for the binary tree that infinitely repeats a copy of itself:</p>
+a <a href="https://en.wikipedia.org/wiki/Tree_(data_structure)">tree</a> because
+it contains a cycle. However, we can think of it as a convenient
+notation for the binary tree that infinitely repeats a copy of itself:</p>
 <p><img src="../images/6die_inf2.png" style="display: block; margin-left: auto; margin-right: auto; margin-top: 10px; margin-bottom: 25px; width: 90%" /></p>
 <p>So it really is a tree (with repeating self-similar structure) as long
 as you allow for infinite trees, which are no problem in a lazy
@@ -121,7 +119,7 @@ language like Haskell and can easily be encoded using
 or by coinductive types in proof assistants like
 <a href="https://coq.inria.fr/">Coq</a> and
 <a href="https://wiki.portal.chalmers.se/agda/pmwiki.php">Agda</a>.</p>
-<p>One downside of rejection sampling is that termination isn’t truly
+<p>A minor downside of rejection sampling is that termination isn’t truly
 guaranteed. For example, the 6-sided die sampler conceivably could
 take the rejection path at every iteration and loop forever without
 ever producing a sample. That would be rather unlikely,
@@ -144,53 +142,32 @@ Coq. The easiest way to get it is through opam:</p>
 project to gain access to everything in the <code>Zar</code> namespace. A sample
 dune project containing the code in this article can be found
 <a href="https://github.com/bagnalla/ocamlzar-example">here</a>.</p>
-<p>Since there doesn’t seem to be a standard streaming library for OCaml
-(although
-<a href="https://ocaml.org/p/streaming/0.8.0/doc/index.html">streaming</a> looks
-promising), Zar defines its own stream type with the following
-interface (from
-<a href="https://github.com/bagnalla/ocamlzar/blob/main/lib/stream.mli">stream.mli</a>):</p>
+<p>Currently (although this may change in the future), Zar defines its
+own stream type (see
+<a href="https://github.com/bagnalla/ocamlzar/blob/main/lib/stream.mli">stream.mli</a>
+for the full interface):</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode ocaml"><code class="sourceCode ocaml"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">(** Streams / Lazy infinite lists. *)</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> 'a stream =</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  | SCons <span class="kw">of</span> 'a * (<span class="dt">unit</span> -&gt; 'a stream)</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co">(** First element (head) of a stream. *)</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="kw">val</span> first : 'a stream -&gt; 'a</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="co">(** Rest (tail) of a stream. *)</span></span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="kw">val</span> rest : 'a stream -&gt; 'a stream</span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="co">(** Take the first n elements of a stream. *)</span></span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="kw">val</span> take : <span class="dt">int</span> -&gt; 'a stream -&gt; 'a <span class="dt">list</span></span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="co">(** Drop the first n elements of a stream. *)</span></span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="kw">val</span> drop : <span class="dt">int</span> -&gt; 'a stream -&gt; 'a stream</span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="co">(** Map a function over a stream. *)</span></span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="kw">val</span> map : ('a -&gt; 'b) -&gt; 'a stream -&gt; 'b stream</span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a><span class="co">(** Build a stream from a head and tail. *)</span></span>
-<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a><span class="kw">val</span> scons : 'a -&gt; 'a stream -&gt; 'a stream</span></code></pre></div>
-<p>If you recall from our introduction, Zar samplers can be thought of as
-<em>fair coin transformers</em>. The basic construction for the n-sided die
-is therefore given by <code>die_transformer</code>:</p>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  | SCons <span class="kw">of</span> 'a * (<span class="dt">unit</span> -&gt; 'a stream)</span></code></pre></div>
+<p>Recall that Zar samplers can be thought of as <em>fair coin
+transformers</em>. The basic construction for the n-sided die is therefore
+given by <code>die_transformer</code>:</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode ocaml"><code class="sourceCode ocaml"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">val</span> die_transformer : <span class="dt">int</span> -&gt; <span class="dt">bool</span> stream -&gt; <span class="dt">int</span> stream</span></code></pre></div>
-<p>For any <code>n &gt; 0</code>, <code>die_transformer n</code> is a function that transforms a
-stream of fair coin flips into a stream of n-sided die rolls. To start
-rolling the die, we just need to apply the transformer to an
-appropriate source. Zar provides a default source of fair coin flips
-built on OCaml’s <code>Random</code> module:</p>
+<p>For any positive <code>n</code>, <code>die_transformer n</code> is a function that
+transforms a stream of fair coin flips into a stream of n-sided die
+rolls. Zar provides a default source of fair coin flips using OCaml’s
+<code>Random</code> module:</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode ocaml"><code class="sourceCode ocaml"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co">(** Default uniformly distributed random bit stream. *)</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="kw">val</span> bits : <span class="dt">unit</span> -&gt; <span class="dt">bool</span> stream</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="co">(** Initialize PRNG used for default bit stream. *)</span></span>
 <span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="kw">val</span> seed : <span class="dt">unit</span> -&gt; <span class="dt">unit</span></span></code></pre></div>
 <p>The following code generates a list of 10 rolls of a 6-sided die by
-applying <code>die_transformer 6</code> to <code>bits ()</code>:</p>
+applying <code>die_transformer 6</code> to the default bit stream <code>bits ()</code>:</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode ocaml"><code class="sourceCode ocaml"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> die = Zar.die_transformer <span class="dv">6</span> @@ Zar.bits () <span class="kw">in</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> samples = Zar.take <span class="dv">10</span> die <span class="kw">in</span></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co">(* Do something with samples *)</span></span></code></pre></div>
-<p>The shortcut function <code>die</code> composes <code>die_transformer</code> with <code>bits</code>:</p>
+<p>The shortcut function <code>die</code> does the same thing:</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode ocaml"><code class="sourceCode ocaml"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> samples = Zar.take <span class="dv">10</span> (Zar.die <span class="dv">6</span>) <span class="kw">in</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co">(* Do something with samples *)</span></span></code></pre></div>
 <p>The Zar OCaml package supports not only n-sided dice but also biased
