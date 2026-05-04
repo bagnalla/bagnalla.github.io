@@ -177,7 +177,7 @@ With Alice’s rollback leniency, Bob sees a larger uncertainty region around Al
 <li>Each client synchronizes its clock to <code>serverClock + max(0, RTT/2 - ping_charity)</code>.</li>
 </ul>
 <p>Although ping charity applies equally to everyone, we see that each client’s <code>RTT/2</code> places an upper bound on how much they can benefit from it. In the special case when all clients have equal pings, the effect of ping charity is nullified (since all clients equally “pay” for one another). But it gets interesting when the clients have different pings.</p>
-<p>Let’s take the opening example. Alice has 160ms ping and Bob has 60ms ping. With no ping charity, Bob sees Alice with 60ms of effective lag, while Alice sees Bob with 160ms. With 50ms of charity, the two values meet in the middle at 110ms.</p>
+<p>Let’s take the example from Armagetron’s network docs. Alice has 160ms ping and Bob has 60ms ping. With no ping charity, Bob sees Alice with 60ms of effective lag, while Alice sees Bob with 160ms. With 50ms of charity, the two values meet in the middle at 110ms.</p>
 <figure>
 <img src="../images/ping-charity/lag-diamond-60-160-no-charity.svg" alt="Side-by-side lag-o-meter comparison without ping charity: Bob sees Alice with a 60 ms uncertainty region, while Alice sees Bob with a 160 ms uncertainty region.">
 <figcaption>
