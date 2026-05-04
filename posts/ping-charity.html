@@ -129,7 +129,7 @@ With 50ms one-way latency and 50ms client lead, a remote command from server tim
 <figure>
 <img src="../images/ping-charity/charity-timeline-normal.svg" alt="Timeline showing Alice's command without rollback leniency: Alice proposes a command at S plus 50 ms, the server accepts it at S plus 50 ms, and Bob receives it when his clock reads S plus 150 ms.">
 <figcaption>
-Without rollback, Alice’s command keeps its future timestamp, so Bob receives it as a 100ms-old event.
+Without rollback, Bob receives Alice’s command as a 100ms-old event.
 </figcaption>
 </figure>
 <p>From Bob’s perspective there is a 100ms window of uncertainty about Alice’s current position and orientation (and vice versa). Armagetron renders a visualization of this uncertainty called a lag-o-meter (or sometimes “lag diamond”):</p>
@@ -156,7 +156,7 @@ With rollback leniency, Alice’s accepted command timestamp moves 50ms into the
 <figure>
 <img src="../images/ping-charity/charity-timeline-bob-command.svg" alt="Timeline showing Bob's command: Bob proposes a command at S plus 50 ms, the server accepts it at S plus 50 ms, and Alice receives it when her clock reads S plus 100 ms.">
 <figcaption>
-In the reverse direction, Bob’s client lead means his command needs no rollback, and Alice receives it as only a 50ms-old event.
+In the reverse direction, Alice receives Bob’s command as only a 50ms-old event.
 </figcaption>
 </figure>
 <p>Alice sees Bob’s command with a delay of only 50ms! Viewed as lag-o-meters:</p>
@@ -180,13 +180,13 @@ With Alice’s rollback leniency, Bob sees a larger uncertainty region around Al
 <figure>
 <img src="../images/ping-charity/lag-diamond-60-160-no-charity.svg" alt="Side-by-side lag-o-meter comparison without ping charity: Bob sees Alice with a 60 ms uncertainty region, while Alice sees Bob with a 160 ms uncertainty region.">
 <figcaption>
-Without ping charity, each player sees the other through the lens of their own connection to the server.
+Without ping charity, each player sees lag based only on their own connection to the server.
 </figcaption>
 </figure>
 <figure>
 <img src="../images/ping-charity/lag-diamond-60-160-charity.svg" alt="Side-by-side lag-o-meter comparison with 50 ms ping charity: Bob sees Alice and Alice sees Bob with equal 110 ms uncertainty regions.">
 <figcaption>
-With 50ms of ping charity, the lag-o-meters meet in the middle at 110ms.
+With 50ms of ping charity, the lag meets in the middle at 110ms.
 </figcaption>
 </figure>
 <p>The size of lag-o-meters is based on the speed of the peer’s cycle and the effective lag computed by the following formula:</p>
