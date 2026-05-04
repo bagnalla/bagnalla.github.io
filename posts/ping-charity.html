@@ -80,9 +80,6 @@ Clipped from <a href="https://www.youtube.com/watch?v=7nizCUOlvb8"><cite>2 Minut
 <p>
 In short, if you have low ping and your opponent has high ping (ping: the time it takes a message to travel from your computer to the server and back, usually measured in milliseconds), you can take over some of his ping to make the situation more equal. So, if you have ping 60, your opponent has ping 160 and you set the ping charity to at least 50 (more does not change the situation), you will take over 50 ms of his ping, giving you both ping 110.
 </p>
-<footer>
-<cite><a href="https://armagetron.sourceforge.net/doc/network.html">Armagetron network docs</a></cite>
-</footer>
 </blockquote>
 <p>And <a href="https://gitlab.com/armagetronad/armagetronad/-/blob/trunk/language/english_base.txt?ref_type=heads#L726">the game’s help text</a> describes the <code>PING_CHARITY</code> config variable as “How much ping are you willing to take over from your opponent.”</p>
 <p>At this point you’re probably thinking “Ok… what?” You can’t just take ping from your opponent, right? After all, ping is determined by physics. If it takes 160ms for your opponent’s packets to round-trip, there’s nothing you can do to change that.</p>
