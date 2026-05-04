@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 256" role="img" aria-labelledby="title desc">
+  <title id="title">Client clock lead removes local input delay</title>
+  <desc id="desc">A client running one-way latency ahead can apply input immediately and have it arrive at the server on time.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#d8d1a1"/>
+    </marker>
+    <style>
+      .bg{fill:#11151c}.axis{stroke:#b7beb5;stroke-width:2}.dash{stroke:#1f5a2e;stroke-width:1;stroke-dasharray:5 6}
+      .text{fill:#e6f2e7;font:16px system-ui,-apple-system,Segoe UI,sans-serif}.small{fill:#a5b8aa;font:14px system-ui,-apple-system,Segoe UI,sans-serif}
+      .tiny{fill:#a5b8aa;font:12px system-ui,-apple-system,Segoe UI,sans-serif}
+      .server{fill:#d7d8cf}.client{fill:#c4d141}.event{fill:#f4ec38}.packet{stroke:#d8d1a1;stroke-width:2;fill:none;marker-end:url(#arrow)}
+      .lead{fill:#72791d;opacity:.28}.label{fill:#c4d141;font:14px system-ui,-apple-system,Segoe UI,sans-serif}
+    </style>
+  </defs>
+  <rect class="bg" width="600" height="256" rx="10"/>
+
+  <g transform="translate(74,0)">
+    <line class="axis" x1="0" y1="40" x2="480" y2="40"/>
+    <line class="axis" x1="0" y1="180" x2="480" y2="180"/>
+    <text class="text" x="-58" y="45">Server</text>
+    <text class="text" x="-50" y="185">Client</text>
+
+    <line class="dash" x1="0" y1="18" x2="0" y2="210"/>
+    <line class="dash" x1="300" y1="18" x2="300" y2="210"/>
+    <text class="tiny" x="-8" y="66">S</text>
+    <text class="tiny" x="276" y="66">S + 50</text>
+    <text class="tiny" x="-25" y="238">S + 50</text>
+    <text class="tiny" x="272" y="238">S + 100</text>
+
+    <rect class="lead" x="0" y="154" width="300" height="52" rx="6"/>
+    <text class="label" x="24" y="149">client sim is 50 ms ahead</text>
+
+    <text class="small" x="14" y="202">local sim tick S + 50</text>
+
+    <circle class="client" cx="0" cy="180" r="7"/>
+    <text class="small" x="14" y="169">input applied now</text>
+
+    <circle class="server" cx="300" cy="40" r="7"/>
+    <text class="small" x="207" y="26">server receives at S + 50</text>
+
+    <path class="packet" d="M8,176 C112,130 176,86 292,44"/>
+  </g>
+</svg>

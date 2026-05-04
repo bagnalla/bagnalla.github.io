@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 332" role="img" aria-labelledby="title desc">
+  <title id="title">Asymmetric clock leads shift who pays latency</title>
+  <desc id="desc">With equal pings, changing one client's lead shifts apparent turn age from one player to the other.</desc>
+  <defs>
+    <style>
+      .bg{fill:#11151c}.panel{fill:#171d27;stroke:#2d3442;stroke-width:1}.text{fill:#e6f2e7;font:16px system-ui,-apple-system,Segoe UI,sans-serif}
+      .small{fill:#a5b8aa;font:14px system-ui,-apple-system,Segoe UI,sans-serif}.bar{fill:#244f30}.value{fill:#c4d141}
+    </style>
+  </defs>
+  <rect class="bg" width="600" height="332" rx="10"/>
+
+  <g transform="translate(28,26)">
+    <rect class="panel" x="0" y="0" width="544" height="118" rx="8"/>
+    <text class="text" x="18" y="28">No charity</text>
+    <text class="small" x="18" y="52">Alice lead = 50 ms, Bob lead = 50 ms</text>
+    <text class="small" x="18" y="78">Bob sees Alice</text>
+    <rect class="bar" x="190" y="63" width="300" height="22" rx="5"/>
+    <rect class="value" x="190" y="63" width="200" height="22" rx="5"/>
+    <text class="small" x="402" y="79">100 ms</text>
+    <text class="small" x="18" y="105">Alice sees Bob</text>
+    <rect class="bar" x="190" y="90" width="300" height="22" rx="5"/>
+    <rect class="value" x="190" y="90" width="200" height="22" rx="5"/>
+    <text class="small" x="402" y="106">100 ms</text>
+  </g>
+
+  <g transform="translate(28,174)">
+    <rect class="panel" x="0" y="0" width="544" height="128" rx="8"/>
+    <text class="text" x="18" y="28">Alice gets 50 ms rollback leniency</text>
+    <text class="small" x="18" y="52">Alice lead = 0 ms, Bob lead = 50 ms</text>
+    <text class="small" x="18" y="82">Bob sees Alice</text>
+    <rect class="bar" x="190" y="67" width="300" height="22" rx="5"/>
+    <rect class="value" x="190" y="67" width="300" height="22" rx="5"/>
+    <text class="small" x="500" y="83">150 ms</text>
+    <text class="small" x="18" y="111">Alice sees Bob</text>
+    <rect class="bar" x="190" y="96" width="300" height="22" rx="5"/>
+    <rect class="value" x="190" y="96" width="100" height="22" rx="5"/>
+    <text class="small" x="302" y="112">50 ms</text>
+  </g>
+</svg>

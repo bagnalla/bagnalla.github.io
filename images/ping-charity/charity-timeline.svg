@@ -1,0 +1,105 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 500" role="img" aria-labelledby="title desc">
+  <title id="title">Rollback leniency changes the accepted command time</title>
+  <desc id="desc">Two timelines compare no charity with Alice receiving rollback leniency. The packets arrive at the same real times, but Alice's accepted command timestamp is backdated in the rollback case.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#d8dee9"/>
+    </marker>
+    <marker id="rollback-arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#f97316"/>
+    </marker>
+    <style>
+      .bg{fill:#11151c}.panel{fill:#171d27;stroke:#2d3442;stroke-width:1}.axis{stroke:#6b7280;stroke-width:2}
+      .dash{stroke:#3f4756;stroke-width:1;stroke-dasharray:5 6}.row{stroke:#273041;stroke-width:1}
+      .text{fill:#e5e7eb;font:16px system-ui,-apple-system,Segoe UI,sans-serif}.small{fill:#a8b0bd;font:14px system-ui,-apple-system,Segoe UI,sans-serif}
+      .tiny{fill:#a8b0bd;font:12px system-ui,-apple-system,Segoe UI,sans-serif;paint-order:stroke;stroke:#171d27;stroke-linejoin:round;stroke-width:3px}.packet{stroke:#d8dee9;stroke-width:2;fill:none;marker-end:url(#arrow)}
+      .rollback{stroke:#f97316;stroke-width:2;fill:none;marker-end:url(#rollback-arrow)}.alice{fill:#a78bfa}.server{fill:#67e8f9}.bob{fill:#f9a8d4}
+      .event{fill:#facc15}.accepted{fill:#f97316}.badge{fill:#243044;stroke:#334155;stroke-width:1}.age{fill:#facc15;font:13px ui-monospace,SFMono-Regular,Menlo,monospace}
+      .note{fill:#cbd5e1;font:13px ui-monospace,SFMono-Regular,Menlo,monospace}
+    </style>
+  </defs>
+  <rect class="bg" width="600" height="500" rx="10"/>
+  <text class="text" x="26" y="34">Same packets, different accepted command time</text>
+  <text class="small" x="26" y="58">RTT = 100 ms, one-way = 50 ms; Bob's clock is 50 ms ahead of the server.</text>
+
+  <g transform="translate(26,82)">
+    <rect class="panel" x="0" y="0" width="548" height="172" rx="8"/>
+    <text class="text" x="16" y="28">No charity</text>
+    <text class="note" x="116" y="28">Alice lead = 50 ms, Bob lead = 50 ms</text>
+
+    <line class="row" x1="98" y1="62" x2="510" y2="62"/>
+    <line class="row" x1="98" y1="104" x2="510" y2="104"/>
+    <line class="row" x1="98" y1="146" x2="510" y2="146"/>
+    <text class="small" x="18" y="67">Alice</text>
+    <text class="small" x="18" y="109">Server</text>
+    <text class="small" x="18" y="151">Bob</text>
+
+    <line class="dash" x1="112" y1="48" x2="112" y2="154"/>
+    <line class="dash" x1="296" y1="48" x2="296" y2="154"/>
+    <line class="dash" x1="480" y1="48" x2="480" y2="154"/>
+    <text class="tiny" x="104" y="166">S</text>
+    <text class="tiny" x="270" y="166">S + 50</text>
+    <text class="tiny" x="451" y="166">S + 100</text>
+
+    <path class="packet" d="M119,65 C174,76 231,92 289,102"/>
+    <path class="packet" d="M303,106 C357,117 418,132 473,144"/>
+
+    <circle class="alice" cx="112" cy="62" r="7"/>
+    <circle class="event" cx="112" cy="62" r="4"/>
+    <text class="tiny" x="124" y="57">press</text>
+    <text class="tiny" x="124" y="72">cmd time S + 50</text>
+
+    <circle class="server" cx="296" cy="104" r="7"/>
+    <text class="tiny" x="198" y="99">server receives</text>
+    <text class="tiny" x="198" y="114">accepts S + 50</text>
+
+    <circle class="bob" cx="480" cy="146" r="7"/>
+    <text class="tiny" x="358" y="134">Bob receives</text>
+    <text class="tiny" x="358" y="149">Bob clock S + 150</text>
+    <rect class="badge" x="414" y="84" width="90" height="24" rx="5"/>
+    <text class="age" x="425" y="101">age 100 ms</text>
+  </g>
+
+  <g transform="translate(26,278)">
+    <rect class="panel" x="0" y="0" width="548" height="190" rx="8"/>
+    <text class="text" x="16" y="28">Alice gets 50 ms rollback leniency</text>
+    <text class="note" x="16" y="50">Alice lead = 0 ms, Bob lead = 50 ms</text>
+
+    <line class="row" x1="98" y1="82" x2="510" y2="82"/>
+    <line class="row" x1="98" y1="124" x2="510" y2="124"/>
+    <line class="row" x1="98" y1="166" x2="510" y2="166"/>
+    <text class="small" x="18" y="87">Alice</text>
+    <text class="small" x="18" y="129">Server</text>
+    <text class="small" x="18" y="171">Bob</text>
+
+    <line class="dash" x1="112" y1="68" x2="112" y2="174"/>
+    <line class="dash" x1="296" y1="68" x2="296" y2="174"/>
+    <line class="dash" x1="480" y1="68" x2="480" y2="174"/>
+    <text class="tiny" x="104" y="186">S</text>
+    <text class="tiny" x="270" y="186">S + 50</text>
+    <text class="tiny" x="451" y="186">S + 100</text>
+
+    <path class="packet" d="M119,85 C174,96 231,112 289,122"/>
+    <path class="packet" d="M303,126 C357,137 418,152 473,164"/>
+    <path class="rollback" d="M287,124 C236,154 170,154 121,127"/>
+
+    <circle class="alice" cx="112" cy="82" r="7"/>
+    <circle class="event" cx="112" cy="82" r="4"/>
+    <text class="tiny" x="124" y="77">press</text>
+    <text class="tiny" x="124" y="92">cmd time S</text>
+
+    <circle class="server" cx="296" cy="124" r="7"/>
+    <text class="tiny" x="308" y="119">server receives</text>
+    <text class="tiny" x="308" y="134">at S + 50</text>
+
+    <circle class="accepted" cx="112" cy="124" r="7"/>
+    <text class="tiny" x="124" y="132">accepts at S</text>
+    <text class="tiny" x="176" y="160">rollback 50 ms</text>
+
+    <circle class="bob" cx="480" cy="166" r="7"/>
+    <text class="tiny" x="358" y="154">Bob receives</text>
+    <text class="tiny" x="358" y="169">Bob clock S + 150</text>
+    <rect class="badge" x="414" y="94" width="90" height="24" rx="5"/>
+    <text class="age" x="425" y="111">age 150 ms</text>
+  </g>
+</svg>

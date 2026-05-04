@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 210" role="img" aria-labelledby="title desc">
+  <title id="title">Negative input delay via local rollback</title>
+  <desc id="desc">The client subtracts a forgiveness window from the input timestamp and may insert the input into the previous tick.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#d7562f"/>
+    </marker>
+    <style>
+      .bg{fill:#11151c}.axis{stroke:#b7beb5;stroke-width:2}.tick{stroke:#1f5a2e;stroke-width:1}.text{fill:#e6f2e7;font:16px system-ui,-apple-system,Segoe UI,sans-serif}
+      .small{fill:#a5b8aa;font:14px system-ui,-apple-system,Segoe UI,sans-serif}.press{fill:#f4ec38}.effective{fill:#c4d141}.window{fill:#72791d;opacity:.28}
+      .rollback{stroke:#d7562f;stroke-width:2;fill:none;marker-end:url(#arrow)}.label{fill:#c4d141;font:14px system-ui,-apple-system,Segoe UI,sans-serif}
+    </style>
+  </defs>
+  <rect class="bg" width="600" height="210" rx="10"/>
+
+  <g transform="translate(70,28)">
+    <line class="axis" x1="0" y1="80" x2="480" y2="80"/>
+    <text class="text" x="-50" y="85">Client</text>
+
+    <line class="tick" x1="60" y1="34" x2="60" y2="128"/>
+    <line class="tick" x1="200" y1="34" x2="200" y2="128"/>
+    <line class="tick" x1="340" y1="34" x2="340" y2="128"/>
+    <line class="tick" x1="480" y1="34" x2="480" y2="128"/>
+    <text class="small" x="28" y="154">tick N-1</text>
+    <text class="small" x="179" y="154">tick N</text>
+    <text class="small" x="315" y="154">tick N+1</text>
+
+    <rect class="window" x="152" y="48" width="100" height="64" rx="6"/>
+    <text class="label" x="112" y="36">half tick + queue latency</text>
+
+    <circle class="press" cx="252" cy="80" r="8"/>
+    <text class="small" x="220" y="67">key event delivered</text>
+
+    <circle class="effective" cx="190" cy="80" r="8"/>
+    <text class="small" x="108" y="110">effective timestamp</text>
+
+    <path class="rollback" d="M252,92 C242,132 200,132 190,92"/>
+    <text class="small" x="284" y="104">insert, then replay</text>
+
+    <path class="rollback" d="M340,54 C300,10 230,10 193,54"/>
+    <text class="small" x="260" y="12">rollback local state</text>
+  </g>
+</svg>

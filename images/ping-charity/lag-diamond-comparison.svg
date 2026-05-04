@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 28 600 248" role="img" aria-labelledby="title desc">
+  <title id="title">Lag-o-meter comparison after rollback leniency</title>
+  <desc id="desc">Two side-by-side game views compare Bob seeing Alice with 150 milliseconds of apparent lag and Alice seeing Bob with 50 milliseconds of apparent lag.</desc>
+  <defs>
+    <marker id="alice-arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#c4d141"/>
+    </marker>
+    <marker id="bob-arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#d7562f"/>
+    </marker>
+    <style>
+      .panel{fill:#010101}.grid{stroke:#1f5a2e;stroke-width:1;opacity:.42}
+      .text{fill:#e6f2e7;font:16px system-ui,-apple-system,Segoe UI,sans-serif}.small{fill:#a5b8aa;font:14px system-ui,-apple-system,Segoe UI,sans-serif}
+      .tiny{fill:#a5b8aa;font:12px system-ui,-apple-system,Segoe UI,sans-serif}.badge{fill:#08100c;stroke:#244f30;stroke-width:1}
+      .age{fill:#d8d1a1;font:13px ui-monospace,SFMono-Regular,Menlo,monospace}.lag{opacity:.26;stroke-width:2}.alice-lag{fill:#72791d;stroke:#a6b432}.bob-lag{fill:#9c2f20;stroke:#d7562f}
+      .wall{stroke-width:8;stroke-linecap:round;opacity:.92}.alice-wall{stroke:#a6b432}.bob-wall{stroke:#b73a23}.alice{fill:#c4d141;stroke:#eef58a;stroke-width:1}.bob{fill:#d7562f;stroke:#ff9a78;stroke-width:1}
+      .alice-dir{stroke:#c4d141;stroke-width:2;marker-end:url(#alice-arrow)}.bob-dir{stroke:#d7562f;stroke-width:2;marker-end:url(#bob-arrow)}
+    </style>
+  </defs>
+  <g transform="translate(28,28)">
+    <rect class="panel" x="0" y="0" width="260" height="248" rx="8"/>
+    <text class="text" x="16" y="28">Bob's view of Alice</text>
+    <rect class="badge" x="174" y="38" width="68" height="24" rx="5"/>
+    <text class="age" x="184" y="55">150 ms</text>
+    <text class="tiny" x="16" y="56">large uncertainty region</text>
+
+    <g transform="translate(16,72)">
+      <path class="grid" d="M0 0H228M0 32H228M0 64H228M0 96H228M0 128H228M0 160H228M0 0V160M38 0V160M76 0V160M114 0V160M152 0V160M190 0V160M228 0V160"/>
+      <path class="lag alice-lag" d="M114 8 L228 80 L114 152 L0 80 Z"/>
+      <path class="wall alice-wall" d="M14 80 H104"/>
+      <circle class="alice" cx="114" cy="80" r="10"/>
+      <line class="alice-dir" x1="126" y1="80" x2="178" y2="80"/>
+    </g>
+  </g>
+
+  <g transform="translate(312,28)">
+    <rect class="panel" x="0" y="0" width="260" height="248" rx="8"/>
+    <text class="text" x="16" y="28">Alice's view of Bob</text>
+    <rect class="badge" x="182" y="38" width="60" height="24" rx="5"/>
+    <text class="age" x="193" y="55">50 ms</text>
+    <text class="tiny" x="16" y="56">small uncertainty region</text>
+
+    <g transform="translate(16,72)">
+      <path class="grid" d="M0 0H228M0 32H228M0 64H228M0 96H228M0 128H228M0 160H228M0 0V160M38 0V160M76 0V160M114 0V160M152 0V160M190 0V160M228 0V160"/>
+      <path class="lag bob-lag" d="M114 56 L152 80 L114 104 L76 80 Z"/>
+      <path class="wall bob-wall" d="M36 80 H104"/>
+      <circle class="bob" cx="114" cy="80" r="10"/>
+      <line class="bob-dir" x1="126" y1="80" x2="158" y2="80"/>
+    </g>
+  </g>
+</svg>

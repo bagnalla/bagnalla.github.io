@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 32 600 280" role="img" aria-labelledby="title desc">
+  <title id="title">Lag-o-meter uncertainty diamond</title>
+  <desc id="desc">A cycle may be anywhere within the lag-o-meter region because recent turns may not have arrived yet.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#c4d141"/>
+    </marker>
+    <style>
+      .arena{fill:#010101}.grid{stroke:#1f5a2e;stroke-width:1;opacity:.42}.wall{stroke:#a6b432;stroke-width:10;stroke-linecap:round}.cycle{fill:#c4d141;stroke:#eef58a;stroke-width:1.5}
+      .diamond{fill:#72791d;opacity:.34;stroke:#a6b432;stroke-width:2}.text{fill:#e6f2e7;font:16px system-ui,-apple-system,Segoe UI,sans-serif}
+      .small{fill:#a5b8aa;font:14px system-ui,-apple-system,Segoe UI,sans-serif}.arrow{stroke:#c4d141;stroke-width:2;marker-end:url(#arrow)}
+    </style>
+  </defs>
+  <g transform="translate(60,32)">
+    <rect class="arena" width="480" height="280"/>
+    <path class="grid" d="M0 0H480M0 40H480M0 80H480M0 120H480M0 160H480M0 200H480M0 240H480M0 280H480M0 0V280M40 0V280M80 0V280M120 0V280M160 0V280M200 0V280M240 0V280M280 0V280M320 0V280M360 0V280M400 0V280M440 0V280M480 0V280"/>
+    <path class="diamond" d="M240 38 L362 140 L240 242 L118 140 Z"/>
+    <path class="wall" d="M80 140 H230"/>
+    <circle class="cycle" cx="240" cy="140" r="12"/>
+    <line class="arrow" x1="254" y1="140" x2="320" y2="140"/>
+    <text class="small" x="190" y="276">current rendered position</text>
+    <text class="small" x="314" y="132">possible forward position</text>
+    <text class="small" x="48" y="52">possible unseen turn</text>
+  </g>
+</svg>

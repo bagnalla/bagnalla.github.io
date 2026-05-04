@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 238" role="img" aria-labelledby="title desc">
+  <title id="title">Client lead increases remote command age</title>
+  <desc id="desc">A remote command from server time S reaches a client after 50 milliseconds of network latency, but the client's local clock reads S plus 100 milliseconds because it runs 50 milliseconds ahead.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#d8d1a1"/>
+    </marker>
+    <style>
+      .bg{fill:#11151c}.axis{stroke:#b7beb5;stroke-width:2}.dash{stroke:#1f5a2e;stroke-width:1;stroke-dasharray:5 6}
+      .text{fill:#e6f2e7;font:16px system-ui,-apple-system,Segoe UI,sans-serif}.small{fill:#a5b8aa;font:14px system-ui,-apple-system,Segoe UI,sans-serif}
+      .over{paint-order:stroke;stroke:#11151c;stroke-linejoin:round;stroke-width:4px}
+      .tiny{fill:#a5b8aa;font:12px system-ui,-apple-system,Segoe UI,sans-serif}.server{fill:#d7d8cf}.client{fill:#c4d141}.event{fill:#f4ec38}
+      .packet{stroke:#d8d1a1;stroke-width:2;fill:none;marker-end:url(#arrow)}.lead{fill:#72791d;opacity:.28}
+      .label{fill:#c4d141;font:14px system-ui,-apple-system,Segoe UI,sans-serif}.badge{fill:#08100c;stroke:#244f30;stroke-width:1}
+      .age{fill:#d8d1a1;font:13px ui-monospace,SFMono-Regular,Menlo,monospace}
+    </style>
+  </defs>
+  <rect class="bg" width="600" height="238" rx="10"/>
+
+  <g transform="translate(74,0)">
+    <line class="axis" x1="0" y1="40" x2="480" y2="40"/>
+    <line class="axis" x1="0" y1="170" x2="480" y2="170"/>
+    <text class="text" x="-58" y="45">Server</text>
+    <text class="text" x="-50" y="175">Client</text>
+
+    <line class="dash" x1="0" y1="18" x2="0" y2="198"/>
+    <line class="dash" x1="300" y1="18" x2="300" y2="198"/>
+    <text class="tiny" x="-8" y="66">S</text>
+    <text class="tiny" x="276" y="66">S + 50</text>
+    <text class="tiny" x="-25" y="224">S + 50</text>
+    <text class="tiny" x="272" y="224">S + 100</text>
+
+    <rect class="lead" x="0" y="146" width="300" height="48" rx="6"/>
+    <text class="label" x="18" y="141">client sim is 50 ms ahead</text>
+
+    <circle class="server" cx="0" cy="40" r="7"/>
+    <circle class="event" cx="0" cy="40" r="4"/>
+    <text class="small" x="14" y="30">remote command at S</text>
+
+    <path class="packet" d="M8,44 C112,80 190,128 292,166"/>
+    <text class="small" x="76" y="106">server message travels to client</text>
+
+    <circle class="client" cx="300" cy="170" r="7"/>
+    <text class="small over" x="314" y="160">client receives</text>
+    <text class="small over" x="314" y="196">client clock S + 100</text>
+
+  </g>
+</svg>

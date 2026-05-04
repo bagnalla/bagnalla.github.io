@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="en" data-bs-theme="dark">
+  <head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-2LJSDH860E"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());  
+      gtag('config', 'G-2LJSDH860E');
+    </script>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Equal Ping for All</title>
+    
+    <link rel="icon" type="image/png" href="../images/ping-charity/Armagetron_Advanced.png" />
+    
+    <link rel="stylesheet" href="../css/bootstrap.min.css" />
+    <link rel="stylesheet" href="../css/default.css" />
+    <link rel="stylesheet" href="../css/syntax.css" />
+  </head>
+  <body>
+    <header>
+      <div class="logo">
+        <a href="../index.html">Alex Bagnall</a>
+      </div>
+      <nav>
+        <a href="../index.html">Home</a>
+        <a href="../blog.html">Blog</a>
+      </nav>
+    </header>
+
+    <main role="main">
+      <article class="ping-charity">
+    <section class="header">
+        Posted on May  4, 2026
+        
+    </section>
+    <section>
+        <h1 id="equal-ping-for-all">Equal Ping for All</h1>
+<figure class="portrait-figure">
+<img src="../images/ping-charity/lady_justice1.jpg" alt="Watercolor illustration of Lady Justice holding scales and a sword." title="Watercolor by Sophia Rodionov">
+</figure>
+<p>Two players sit down to an online match in a fast-paced game where timing matters. They’re connected to a server. One has a 60ms ping, the other 160ms. How do you make it fair? The standard answer (used in some <a href="https://lolesports.com/en-GB/news/riot-games-tech-blog-artificial-latency-for-remote-competitors">high-profile international tournaments</a>) is to add artificial latency to the low-ping player to make them both equally delayed. But what if you could instead average the two pings by raising one and lowering the other, without increasing the total? That may sound impossible, but a game called Armagetron has been doing it since 2000.</p>
+<blockquote>
+<p>
+How does that “equal ping” thing work? It is not that complicated, but for now, I rather keep the secret buried in the source code (too lazy to explain it right now…).
+</p>
+<footer>
+Z-Man, 2000, <cite><a href="https://armagetron.sourceforge.net/doc/network.html">Armagetron network docs</a></cite>
+</footer>
+</blockquote>
+<h1 id="the-origin-armagetron">The Origin: Armagetron</h1>
+<p>Armagetron Advanced (or “Armagetron” for short) is a classic Tron-inspired multiplayer computer game developed mostly by Manuel Moos (AKA Z-Man) starting in 1999, and first released in 2000 under a GPL license. It is sometimes described as “competitive multiplayer snake.” Each player controls a lightcycle (or “cycle”) and tries to destroy other players’ cycles while not crashing into a wall themself. Development on Armagetron continues to this day, but the core systems haven’t changed much in the last 20 years.</p>
+<figure>
+<video controls muted playsinline preload="metadata" poster="../images/ping-charity/armagetron1.png">
+<source src="../videos/ping-charity/tron1.mp4" type="video/mp4">
+</video>
+<figcaption>
+Spectator footage of Armagetron.
+</figcaption>
+</figure>
+<p>The game’s online community has always been small. For a while it appeared to have completely died, but there’s been a resurgence lately due to the <a href="https://store.steampowered.com/app/1306180/Retrocycles/">Steam release</a> (where it is called <em>Retrocycles</em>), <a href="https://discord.gg/UtqUv85q">The Grid</a> Discord server, and some <a href="https://youtu.be/LqYMm_OKvws?si=W9MDk4uhopdRa9jE">viral YouTube videos</a>.</p>
+<figure>
+<video controls muted playsinline preload="metadata" poster="../images/ping-charity/armagetron1.png">
+<source src="../videos/ping-charity/dogfight.mp4" type="video/mp4">
+</video>
+<figcaption>
+Clipped from <a href="https://www.youtube.com/watch?v=7nizCUOlvb8"><cite>2 Minutes of Loose DF (Armagetron Advanced Gameplay)</cite></a>.
+</figcaption>
+</figure>
+<p>There’s a feature in Armagetron called <em>ping charity</em> that has always been a bit of a mystery. “How does ping charity work?” is a perennial question, and it doesn’t seem to have ever been properly answered. It seems that <em>no one knows how ping charity works</em>. The only public explanation I’ve found says that it “works by altering the space-time continuum.” <a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a> It may be that the only person who truly understands ping charity is Z-Man himself.</p>
+<p>Well, that is, until now. Ping charity turned out to be more interesting than I expected. It combines known techniques in a novel way to achieve something that at first sounds impossible. And I haven’t found evidence of anything quite like it outside of Armagetron (though some things are closely related; see <a href="#appendix">the appendix</a>).</p>
+<p>In this article I will reveal the secret of ping charity. I’ll also try to clarify the basic principles underlying it, and show how they give rise to a related technique: <em>negative input delay</em>.</p>
+<h1 id="ping-charity">Ping Charity</h1>
+<p>This quote from <a href="https://armagetron.sourceforge.net/doc/network.html">Armagetron’s online docs</a> explains it a little more:</p>
+<blockquote>
+<p>
+In short, if you have low ping and your opponent has high ping (ping: the time it takes a message to travel from your computer to the server and back, usually measured in milliseconds), you can take over some of his ping to make the situation more equal. So, if you have ping 60, your opponent has ping 160 and you set the ping charity to at least 50 (more does not change the situation), you will take over 50 ms of his ping, giving you both ping 110.
+</p>
+<footer>
+<cite><a href="https://armagetron.sourceforge.net/doc/network.html">Armagetron network docs</a></cite>
+</footer>
+</blockquote>
+<p>And <a href="https://gitlab.com/armagetronad/armagetronad/-/blob/trunk/language/english_base.txt?ref_type=heads#L726">the game’s help text</a> describes the <code>PING_CHARITY</code> config variable as “How much ping are you willing to take over from your opponent.”</p>
+<p>At this point you’re probably thinking “Ok… what?” You can’t just take ping from your opponent, right? After all, ping is determined by physics. If it takes 160ms for your opponent’s packets to round-trip, there’s nothing you can do to change that.</p>
+<h2 id="so-what-the-fk-is-ping-charity">So what the f@#k <em>is</em> ping charity?</h2>
+<p>Armagetron is open source. All of its code is available in <a href="https://gitlab.com/armagetronad/armagetronad">a public repo</a>. It should be straightforward to figure out what’s going on by just looking at the code. So why hasn’t anyone already done that? My guess is because 1) the code is old, confusing, and sparsely documented,<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a> and 2) the feature itself is counterintuitive. There isn’t just one section of code that implements ping charity; it arises from complementary modifications to two separate mechanisms that already exist for other purposes.<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a> The interaction between them is subtle, and it is completely undocumented (which from Z-Man’s old quote “I rather keep the secret buried in the source code” appears to be a deliberate choice).</p>
+<h1 id="preliminaries">Preliminaries</h1>
+<p>Armagetron uses a client-server architecture. The server runs the full simulation, and its version of events is authoritative. Clients send movement commands, receive other players’ commands and periodic state updates (and possibly corrections to their own commands) from the server, and run their own copy of the simulation locally for client-side prediction.</p>
+<p>Latency has two dimensions:</p>
+<ol type="1">
+<li><strong>Client to server</strong>: how long it takes for the client’s input commands to reach the authoritative sim.</li>
+<li><strong>Server to client</strong>: how long it takes for updates about the world (e.g., other players’ actions) to reach the client.</li>
+</ol>
+<p>Each type of latency induces a lag cost to the client:</p>
+<ul>
+<li>Server-to-client latency causes the client’s view of remote entities to always be slightly outdated. This can be mitigated somewhat by client-side prediction, but the exact state of remote entities is fundamentally unknowable within that latency window.</li>
+<li>Client-to-server latency induces <em>input delay</em>. This is where the client locally delays input processing to account for latency, to align with the time it will be received by the server.</li>
+</ul>
+<figure>
+<img src="../images/ping-charity/input-delay.svg" alt="Timeline showing a synchronized client delaying local input until the server can receive it.">
+<figcaption>
+The client schedules the input far enough in the future for the server to receive it on time.
+</figcaption>
+</figure>
+<h1 id="clock-synchronization">Clock Synchronization</h1>
+<p>Some games like StarCraft and League of Legends can tolerate a bit of input delay, but Armagetron and shooters like Counter-Strike cannot. So there’s a trick to eliminate it: instead of synchronizing perfectly with the server,<a href="#fn4" class="footnote-ref" id="fnref4" role="doc-noteref"><sup>4</sup></a> the client can purposely shift its simulation clock ahead of the server by an extra <code>RTT/2</code> (where <code>RTT</code> is <em>round-trip-time</em>, another name for “ping”). This way inputs can be applied immediately in the local sim (at time <code>S + RTT/2</code> where <code>S</code> is the server time) and arrive just in time to be applied at the same time on the server.<a href="#fn5" class="footnote-ref" id="fnref5" role="doc-noteref"><sup>5</sup></a></p>
+<figure>
+<img src="../images/ping-charity/client-lead.svg" alt="Timeline showing a client clock running one-way latency ahead of the server clock.">
+<figcaption>
+Running the client <code>RTT/2</code> ahead removes input delay.
+</figcaption>
+</figure>
+<p>This effectively converts the cost of input delay into additional staleness/age of remote entities by delaying the client’s view of the world by an extra <code>RTT/2</code>. So you still pay the cost of client-to-server latency, just via extra world lag instead of input delay.</p>
+<figure>
+<img src="../images/ping-charity/client-lead-remote-age.svg" alt="Timeline showing a remote command from server time S reaching a client when the client's local clock reads S plus 100 ms because the client runs 50 ms ahead.">
+<figcaption>
+With 50ms one-way latency and 50ms client lead, a remote command from server time S reaches the client when the client’s local clock reads S + 100 ms.
+</figcaption>
+</figure>
+<p>Here we come to the essence of ping charity: it is technically possible for a client to eliminate input delay <em>without</em> increasing their world lag, by having <em>everyone else</em> pay the cost of their client-to-server latency.<a href="#fn6" class="footnote-ref" id="fnref6" role="doc-noteref"><sup>6</sup></a> But the server must do some work to make that happen.</p>
+<h1 id="rewriting-history">Rewriting History</h1>
+<p>Specifically, the server must be able to <em>rewrite history</em> by retroactively inserting player actions into the past. This can be done via <em>rollback</em>, i.e., rewinding the simulation (or resetting to a snapshot), applying the action, and fast-forwarding back to the present time. This also requires determinism of the simulation to work well. Rollback netcode is commonly associated with peer-to-peer networking in fighting games (see, e.g., <a href="https://www.ggpo.net/">GGPO</a>) but we’ll see here that it has a role to play in the client-server model.</p>
+<p>Armagetron doesn’t do full rollback of the entire game state, but it does support a limited kind of rollback where it rewinds a cycle (moving it in reverse), applies the backdated command, then fast-forwards it back to the present time. By “moving it in reverse” I mean it literally runs the cycle’s usual movement code (Verlet integration) with a negative timestep. And it only rewinds the cycle; the rest of the world remains fixed in the present time (or the future from the re-wound cycle’s point of view) throughout the process.</p>
+<p>There are some subtle limitations and edge cases with this approach (e.g., the cycle can’t be re-wound across different wall segments, and contradictions can arise between the cycle’s new movement and existing walls, causing the infamous “insta-death” phenomenon), but it works fine most of the time.</p>
+<p>Here’s a simplified example to illustrate the point. First let’s see what happens normally, without rollback. Alice and Bob both lead the server by 50ms to eliminate input lag, so they see each other’s actions with 100ms latency:</p>
+<figure>
+<img src="../images/ping-charity/charity-timeline-normal.svg" alt="Timeline showing Alice's command without rollback leniency: Alice proposes a command at S plus 50 ms, the server accepts it at S plus 50 ms, and Bob receives it when his clock reads S plus 150 ms.">
+<figcaption>
+Without rollback, Alice’s command keeps its future timestamp, so Bob receives it as a 100ms-old event.
+</figcaption>
+</figure>
+<p>From Bob’s perspective there is a 100ms window of uncertainty about Alice’s current position and orientation (and vice versa). Armagetron renders a visualization of this uncertainty called a lag-o-meter (or sometimes “lag diamond”):</p>
+<figure>
+<img src="../images/ping-charity/lag-diamond.svg" alt="A cycle inside a diamond-shaped uncertainty region representing possible unseen movement and turns.">
+<figcaption>
+A lag-o-meter is a visualization of where a remote cycle could be, given the amount of recent history you have not learned yet.
+</figcaption>
+</figure>
+<figure>
+<img src="../images/ping-charity/lagometer.png" alt="In-game screenshot of a yellow Armagetron cycle with a translucent lag-o-meter region extending behind and around it.">
+<figcaption>
+How lag-o-meters typically look in game. The actual shape depends on the server’s cycle turn-delay settings; when quick 180-degree turns are disallowed, the reachable region is more like a triangle than a diamond.
+</figcaption>
+</figure>
+<p>Now let’s have Bob “take over” half of Alice’s ping: the server gives 50ms rollback leniency to Alice but not to Bob. Alice runs her clock in perfect sync with the server’s, while Bob leads by 50ms.</p>
+<figure>
+<img src="../images/ping-charity/charity-timeline-rollback.svg" alt="Timeline showing Alice's command with rollback leniency: the server receives the command at S plus 50 ms, accepts it at S, and Bob receives it when his clock reads S plus 150 ms.">
+<figcaption>
+With rollback leniency, Alice’s accepted command timestamp moves 50ms into the past.
+</figcaption>
+</figure>
+<p>Bob sees Alice’s command with a perceived delay of 150ms. And consider when Bob sends a command:</p>
+<figure>
+<img src="../images/ping-charity/charity-timeline-bob-command.svg" alt="Timeline showing Bob's command: Bob proposes a command at S plus 50 ms, the server accepts it at S plus 50 ms, and Alice receives it when her clock reads S plus 100 ms.">
+<figcaption>
+In the reverse direction, Bob’s client lead means his command needs no rollback, and Alice receives it as only a 50ms-old event.
+</figcaption>
+</figure>
+<p>Alice sees Bob’s command with a delay of only 50ms! Viewed as lag-o-meters:</p>
+<figure>
+<img src="../images/ping-charity/lag-diamond-comparison.svg" alt="Side-by-side lag-o-meter comparison: Bob sees Alice with a large 150 ms uncertainty region, while Alice sees Bob with a small 50 ms uncertainty region.">
+<figcaption>
+With Alice’s rollback leniency, Bob sees a larger uncertainty region around Alice, while Alice sees a smaller one around Bob.
+</figcaption>
+</figure>
+<p>In this example the server is playing favorites, giving Alice special rollback privilege. And Alice takes advantage by shifting her clock. Note that both Alice and the server have to do their respective parts to make this work.</p>
+<p>Bob’s uncertainty around Alice is large because 1) he has to lead the server by 50ms to remove his own local input delay, and 2) he pays an additional 50ms in charity for removing Alice’s input delay. Meanwhile, Alice gets zero input delay for free, so her uncertainty around Bob is due to nothing more than the one-way latency from the server to her.</p>
+<p>The total perceived lag between Alice and Bob is always the same (200ms here), but the “charity” mechanism illustrated here allows the server to decide how it should be distributed between them. As we’ve seen, this can be used to give an unfair advantage to one player over another. But it can also be used to promote fairness by correcting for the natural disadvantage of having a higher ping.</p>
+<h1 id="equal-ping-for-all-1">Equal Ping for All</h1>
+<p>Ping charity doesn’t play favorites; it is universal. And its purpose is to eliminate lag disparity, not to introduce it. It works like this:</p>
+<ul>
+<li>The server chooses a ping charity amount (say, 50ms) and affords it to all clients as a blanket rollback leniency (clamped by their <code>RTT/2</code>), and</li>
+<li>Each client synchronizes its clock to <code>serverClock + max(0, RTT/2 - ping_charity)</code>.</li>
+</ul>
+<p>Although ping charity applies equally to everyone, we see that each client’s <code>RTT/2</code> places an upper bound on how much they can benefit from it. In the special case when all clients have equal pings, the effect of ping charity is nullified (since all clients equally “pay” for one another). But it gets interesting when the clients have different pings.</p>
+<p>Let’s take the opening example. Alice has 160ms ping and Bob has 60ms ping. With no ping charity, Bob sees Alice with 60ms of effective lag, while Alice sees Bob with 160ms. With 50ms of charity, the two values meet in the middle at 110ms.</p>
+<figure>
+<img src="../images/ping-charity/lag-diamond-60-160-no-charity.svg" alt="Side-by-side lag-o-meter comparison without ping charity: Bob sees Alice with a 60 ms uncertainty region, while Alice sees Bob with a 160 ms uncertainty region.">
+<figcaption>
+Without ping charity, each player sees the other through the lens of their own connection to the server.
+</figcaption>
+</figure>
+<figure>
+<img src="../images/ping-charity/lag-diamond-60-160-charity.svg" alt="Side-by-side lag-o-meter comparison with 50 ms ping charity: Bob sees Alice and Alice sees Bob with equal 110 ms uncertainty regions.">
+<figcaption>
+With 50ms of ping charity, the lag-o-meters meet in the middle at 110ms.
+</figcaption>
+</figure>
+<p>The size of lag-o-meters is based on the speed of the peer’s cycle and the effective lag computed by the following formula:</p>
+<div class="formula-block">
+<pre><code>effective lag shown by me for peer =
+  clamp((myPing + peerPing) / 2,
+        myPing - charity,
+        myPing + charity)</code></pre>
+</div>
+<p>Notice that when <code>charity=0</code>, the effective lag for any peer is <code>myPing</code>. That is, with no ping charity, my lag depends only on my connection to the server. But with sufficiently large <code>charity</code>, the effective lag is the average of our individual pings (and this can be different for each peer). The total lag between us is invariant for any value of <code>charity</code>.</p>
+<h2 id="the-tradeoff">The tradeoff</h2>
+<p>Rollback can cause visible snapping of remote entities. But in some contexts (including Armagetron) the tradeoff is very much worth it. The creator of <a href="https://www.ggpo.net/">GGPO</a> explained it nicely (in the context of Street Fighter):</p>
+<blockquote>
+<p>
+<p>The latency is hidden in the window between when your opponent initiates an action and your simulation realizes that an action was performed. The time lost in that window is effectively skipped to your simulation.</p>
+<p>…</p>
+This is not ideal, but the alternative is to delay the entire simulation by 60ms, including local inputs. In practice, losing those 60ms of animation usually results in a greatly preferable user experience. This is partially due to the greatly increased responsiveness of local actions, but is also because most of the time those 60ms just don’t matter that much.
+</p>
+<footer>
+Tony Cannon, <cite><a href="https://drive.google.com/file/d/1cV0fY8e_SC1hIFF5E1rT8XRVRzPjU8W9/view"><em>Fight the Lag!</em></a></cite>
+</footer>
+</blockquote>
+<h1 id="armagetron-in-the-browser">Armagetron in the Browser</h1>
+<p>This investigation of ping charity is part of a broader side project of mine to create an Armagetron clone for the web. Previous attempts to put Armagetron in the browser have largely failed when it came to netcode, because 1) it’s difficult and 2) web browsers notably do not support raw UDP sockets, so you can’t just port Armagetron’s netcode and expect it to work the same.</p>
+<p>I haven’t chosen a name yet, so we’ll just call it Webtron for now. It’s a full rewrite in TypeScript.<a href="#fn7" class="footnote-ref" id="fnref7" role="doc-noteref"><sup>7</sup></a> The core physics and gameplay systems are based on Armagetron’s code, but the networking model is totally different. It uses an event history model, with a fully deterministic simulation implemented as a discrete tick step function parameterized by the events for that tick. Clients propose input events to be added to the history at a scheduled tick. The server accepts or postpones them as needed and broadcasts the authoritative history of events to all clients. When a new client joins (or a resync is requested), it is given a snapshot of the state and all the events up to the present tick so it can sync up.</p>
+<p>The current implementation is basically a netcode tech demo. There’s a single live instance <a href="https://dogfight.fly.dev/play?mode=online">here</a> running on a cheap server in Chicago. Occasionally the server is a bit unstable.</p>
+<p>The event history model with deterministic simulation is cool because it enables proper rollback of the entire game state, which means, among other things, that it supports ping charity without any limitations or weird edge cases.</p>
+<figure>
+<img src="../images/ping-charity/event-history-rollback.svg" alt="Three timelines for Alice, the server, and Bob showing a late event inserted into a rewritable history window.">
+<figcaption>
+Webtron makes the history-rewriting model explicit: events are inserted into recent history, then the affected simulation is replayed.
+</figcaption>
+</figure>
+<p>Ping charity in Webtron works essentially the same as in Armagetron. It continuously rewrites history on the fly to accommodate high-ping clients, who purposely desync their clocks to take advantage of it.</p>
+<p>History rewriting is a powerful tool. It’s fun to speculate how it might be useful in other interesting ways. I have found one thing: a purely client-side optimization that uses local history rewriting to enhance responsiveness of controls.</p>
+<h1 id="negative-input-delay">Negative Input Delay</h1>
+<p>Input latency is not just one-way latency from client to server, but also the local latency between when you press the key and when it gets processed by the client code. Typically this processing happens at a fixed rate, once per tick, so the latency can range anywhere from zero to a full tick duration depending on when during the tick’s lifetime you happen to press the input.</p>
+<p>The worst point is right after inputs are processed for the current tick, causing you to experience a full tick of input latency. But we can remedy this somewhat with local rollback, by sending inputs that occurred in the first half of a tick back in time to the previous tick. This requires rolling back and replaying the last tick. With this technique, input latency ranges over <code>[-0.5, 0.5]</code> ticks instead of <code>[0, 1]</code>.</p>
+<p>Moreover, in the browser, inputs are handled via an asynchronous event queue, and there is a significant and somewhat unpredictable latency between when the input is pressed and when it is received by your input handler. With local rollback, we can also mitigate that delay by measuring it and backdating inputs further by that amount.</p>
+<p>In short: when processing an input, we compute an effective timestamp by subtracting a half-tick duration plus the browser queue latency. If that timestamp lies in the previous tick, we insert it in the history for the previous tick, roll back, and replay. The caveat is that we have to increase our clock lead to compensate (remember that removing input latency trades off for increased world lag); <em>there is no free lunch</em>.</p>
+<figure>
+<img src="../images/ping-charity/negative-input-delay.svg" alt="A tick timeline where a key event timestamp is shifted backward into an earlier tick and replayed.">
+<figcaption>
+Negative input delay is local history rewriting: move the input timestamp back, insert it, and replay.
+</figcaption>
+</figure>
+<p>I call this “mind reader” input processing because it’s as if the game knew ahead of time what you were going to press. Unlike rollback used to hide network latency, negative input delay usually does not produce perceptible visual artifacts, especially at high tick rates.</p>
+<p>I haven’t seen this exact technique described elsewhere, but I have found some existing notions of “negative input latency”:</p>
+<ul>
+<li>A more coarse-grained mechanism for providing forgiveness for late inputs in rhythm games like Fortnite Festival, and</li>
+<li>Server-side prediction techniques in cloud-based gaming services like <a href="https://www.engadget.com/2019-10-10-google-stadia-negative-latency.html">Google Stadia</a>.</li>
+</ul>
+<p>Here is a description of the latter from <a href="https://nolannicholson.com/2019/12/16/exploring-negative-latency.html">a blog post</a> by Nolan Nicholson:</p>
+<blockquote>
+<p>Stadia’s VP of Engineering proclaimed that the service would have negative latency. The buzzword itself implied some kind of physically impossible time travel, but the real explanation was more modest: “‘Negative latency’ is a concept by which Stadia can set up a game with a buffer of predicted latency between the server and player, and then use various methods to undercut it. It can run the game at a super-fast framerate so it can act on player inputs earlier, or it can predict a player’s button presses.”</p>
+</blockquote>
+<p>“Physically impossible time travel”, hah! With rollback, time travel <em>is</em> possible. :)</p>
+<p>The result of all this (negative input delay and server-side rollback-based lag compensation with ping charity) is a freakishly responsive gameplay experience in the browser that feels somewhat magical. Work on the implementation has stalled as I’ve gotten busy and interested in other things. There’s a similar project <a href="https://www.cyclearena.io/">here</a> that appears to have working netcode, but I don’t think it implements any of the ideas described here.</p>
+<h1 id="appendix">Appendix</h1>
+<h2 id="rollback-frame-advantage">Rollback netcode and frame advantage</h2>
+<p>The <a href="https://www.ggpo.net/">GGPO</a> SDK implements rollback networking for peer-to-peer games. In that setting there is no single authoritative server clock, but if the peers are not properly synchronized with one another one side can benefit more from rollback than the other. GGPO calls this imbalance “frame advantage.” <a href="https://drive.google.com/file/d/1cV0fY8e_SC1hIFF5E1rT8XRVRzPjU8W9/view">This excellent article</a> explains:</p>
+<blockquote>
+<p>“Frame advantage” is GGPO’s concept of how much of an advantage, in frames, the local player has due to wall clock skew.</p>
+<p>…</p>
+<p>For example, suppose we calculate that the frame_advantage is 2. This means we believe a neutral observer located equidistant from our two games and equipped with a very good spyglass would see my game rendering frame 20 at the exact instant an opponent’s game is rendering frame 22.</p>
+<p>…</p>
+<p>Each connection peer in a GGPO session is always aware of his local frame advantage and receives periodic updates as to his peer’s calculation of frame advantage. GGPO will attempt to keep the game “fair” by making sure that the local and remote frame advantages agree to within a one-frame tolerance.</p>
+</blockquote>
+<p>GGPO attempts to balance frame advantage. Ping charity equalizes perceived lag by purposely giving frame advantage to higher-ping players.</p>
+<h2 id="client-server-rollback">Client-server rollback</h2>
+<p>The fighting game <a href="https://2xko.riotgames.com/en-us/news/dev/how-2xko-handles-online-play/">2XKO</a> uses a client-server variant of GGPO. They refer to the balancing of frame advantage as “rift balancing”:</p>
+<blockquote>
+<p>If I see a three-frame rollback, you should be seeing the same. If I’m seeing five-frame rollbacks and you’re only seeing one-frame rollbacks, it’s likely because the rift isn’t balanced.</p>
+<p>…</p>
+<p>Without getting too much into the weeds, balancing the rift means synchronizing the game clocks of every player in the game.</p>
+</blockquote>
+<h2 id="favor-the-shooter">“Favor-the-shooter” lag compensation</h2>
+<p>Another related technique is the “favor-the-shooter” lag compensation (i.e., <a href="https://en.wikipedia.org/wiki/Lag_(video_games)#Rewind_time">“rewind time”</a>) used in first-person shooter games like Counter-Strike.</p>
+<p>It works like this: when a player fires, the server rewinds the world (other players’ positions, hitboxes) to where they were on the shooter’s screen at the moment of the click, then resolves the hit there. Like ping charity, this lets a late-arriving input be applied retroactively, and the cost is paid by the other party. The target can be killed “behind cover” from their own perspective because they had already moved by the time the shot landed on the server.</p>
+<p>The rewind mechanism is similar to Armagetron’s except that it rewinds other players rather than the one who issued the command, and is a per-shot hit-resolution rule whereas ping charity is more of a continuous movement-latency policy. The part of ping charity that is missing entirely from favor-the-shooter is deliberate desyncing of the high-ping client’s clock.</p>
+<section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes">
+<hr />
+<ol>
+<li id="fn1"><p><a href="https://forums3.armagetronad.net/viewtopic.php?t=8751">This forum post from 2006</a> gives some insight into ping charity, but I admit I find it more confusing than helpful.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn2"><p><a href="https://forums3.armagetronad.net/viewtopic.php?t=374">This forum thread</a> contains some amusing discussion on Armagetron’s code quality. “yes, it’s all spagetti and he has said so himself - but it works better than any competition at what is most important: gameplay!”<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn3"><p>The rewinding mechanism is used for both ping charity and a blanket lag compensation system that gives all clients some leeway up to a limited “lag credit” budget. Initially, I assumed it existed for lag compensation first and was re-purposed later for ping charity. But the truth is the opposite: ping charity existed in the game as early as 2000, and the lag credit system wasn’t added until 2006!<a href="#fnref3" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn4"><p><a href="https://cs.stackexchange.com/questions/103/clock-synchronization-in-a-network-with-asymmetric-delays">Clock synchronization is hard</a>.<a href="#fnref4" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn5"><p>Assuming stable network conditions and that <code>RTT/2</code> is a good approximation of one-way latency from client to server.<a href="#fnref5" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn6"><p>The sleight of hand here is that the “ping” in ping charity means perceived lag, not physical network latency.<a href="#fnref6" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn7"><p>Most of the code was written by Codex (GPT-5.2). There’s a lot to say about the development experience, but that’s not the focus here.<a href="#fnref7" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
+</section>
+    </section>
+    
+    <footer class="article-footer ai-disclaimer">
+        <strong>AI disclaimer:</strong> I used Codex to generate the diagrams in this article.
+    </footer>
+    
+</article>
+
+    </main>
+
+    <footer>
+      Site built with
+      <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+    </footer>
+  </body>
+</html>

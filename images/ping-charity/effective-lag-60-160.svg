@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 326" role="img" aria-labelledby="title desc">
+  <title id="title">Ping charity equalizes the 60 ms vs 160 ms example</title>
+  <desc id="desc">Without charity, apparent lag is 60 ms for Bob and 160 ms for Alice; with 50 ms charity both become 110 ms.</desc>
+  <defs>
+    <style>
+      .bg{fill:#11151c}.panel{fill:#171d27;stroke:#2d3442;stroke-width:1}.text{fill:#e6f2e7;font:16px system-ui,-apple-system,Segoe UI,sans-serif}
+      .small{fill:#a5b8aa;font:14px system-ui,-apple-system,Segoe UI,sans-serif}.bar{fill:#244f30}.bob{fill:#d7562f}.alice{fill:#c4d141}
+      .formula{fill:#d8d1a1;font:13px ui-monospace,SFMono-Regular,Menlo,monospace}.mark{stroke:#f4ec38;stroke-width:2}
+    </style>
+  </defs>
+  <rect class="bg" width="600" height="326" rx="10"/>
+
+  <g transform="translate(28,28)">
+    <rect class="panel" x="0" y="0" width="544" height="112" rx="8"/>
+    <text class="text" x="18" y="30">No ping charity</text>
+    <text class="small" x="18" y="68">Bob sees Alice</text>
+    <rect class="bar" x="190" y="52" width="320" height="24" rx="5"/>
+    <rect class="bob" x="190" y="52" width="120" height="24" rx="5"/>
+    <text class="small" x="322" y="69">60 ms</text>
+    <text class="small" x="18" y="99">Alice sees Bob</text>
+    <rect class="bar" x="190" y="83" width="320" height="24" rx="5"/>
+    <rect class="alice" x="190" y="83" width="320" height="24" rx="5"/>
+    <text class="small" x="520" y="100">160 ms</text>
+  </g>
+
+  <g transform="translate(28,174)">
+    <rect class="panel" x="0" y="0" width="544" height="112" rx="8"/>
+    <text class="text" x="18" y="30">50 ms ping charity</text>
+    <line class="mark" x1="410" y1="44" x2="410" y2="112"/>
+    <text class="small" x="18" y="68">Bob sees Alice</text>
+    <rect class="bar" x="190" y="52" width="320" height="24" rx="5"/>
+    <rect class="bob" x="190" y="52" width="220" height="24" rx="5"/>
+    <text class="small" x="422" y="69">110 ms</text>
+    <text class="small" x="18" y="99">Alice sees Bob</text>
+    <rect class="bar" x="190" y="83" width="320" height="24" rx="5"/>
+    <rect class="alice" x="190" y="83" width="220" height="24" rx="5"/>
+    <text class="small" x="422" y="100">110 ms</text>
+  </g>
+</svg>

@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 384" role="img" aria-labelledby="title desc">
+  <title id="title">Event history rollback and replay</title>
+  <desc id="desc">A late event is inserted into recent history; the affected simulation rolls back and replays.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#d8d1a1"/>
+    </marker>
+    <marker id="rollback-arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#d7562f"/>
+    </marker>
+    <style>
+      .bg{fill:#11151c}.axis{stroke:#b7beb5;stroke-width:2}.tick{stroke:#1f5a2e;stroke-width:1}.packet{stroke:#d8d1a1;stroke-width:2;fill:none;marker-end:url(#arrow)}
+      .text{fill:#e6f2e7;font:16px system-ui,-apple-system,Segoe UI,sans-serif}.small{fill:#a5b8aa;font:14px system-ui,-apple-system,Segoe UI,sans-serif}
+      .rewrite{fill:#d7562f;opacity:.24}.event{fill:#f4ec38}.server{fill:#d7d8cf}.alice{fill:#c4d141}.bob{fill:#d7562f}
+      .label{fill:#ff9a78;font:14px system-ui,-apple-system,Segoe UI,sans-serif}.rollback{stroke:#d7562f;stroke-width:2;fill:none;marker-end:url(#rollback-arrow)}
+    </style>
+  </defs>
+  <rect class="bg" width="600" height="384" rx="10"/>
+
+  <g transform="translate(82,34)">
+    <rect class="rewrite" x="160" y="0" width="160" height="245" rx="8"/>
+    <text class="label" x="168" y="-10">rewritable history</text>
+
+    <line class="axis" x1="0" y1="40" x2="480" y2="40"/>
+    <line class="axis" x1="0" y1="130" x2="480" y2="130"/>
+    <line class="axis" x1="0" y1="220" x2="480" y2="220"/>
+    <text class="text" x="-62" y="45">Alice</text>
+    <text class="text" x="-70" y="135">Server</text>
+    <text class="text" x="-48" y="225">Bob</text>
+
+    <line class="tick" x1="0" y1="30" x2="0" y2="232"/><text class="small" x="-14" y="268">1000</text>
+    <line class="tick" x1="80" y1="30" x2="80" y2="232"/><text class="small" x="66" y="268">1002</text>
+    <line class="tick" x1="160" y1="30" x2="160" y2="232"/><text class="small" x="146" y="268">1004</text>
+    <line class="tick" x1="240" y1="30" x2="240" y2="232"/><text class="small" x="226" y="268">1006</text>
+    <line class="tick" x1="320" y1="30" x2="320" y2="232"/><text class="small" x="306" y="268">1008</text>
+    <line class="tick" x1="400" y1="30" x2="400" y2="232"/><text class="small" x="386" y="268">1010</text>
+    <line class="tick" x1="480" y1="30" x2="480" y2="232"/><text class="small" x="466" y="268">1012</text>
+
+    <circle class="alice" cx="160" cy="40" r="7"/>
+    <text class="small" x="92" y="26">provisional turn</text>
+    <path class="packet" d="M168,45 C198,78 214,102 232,124"/>
+
+    <circle class="server" cx="240" cy="130" r="7"/>
+    <text class="small" x="252" y="126">received late</text>
+    <circle class="event" cx="160" cy="130" r="7"/>
+    <text class="small" x="88" y="154">insert at 1004</text>
+    <path class="packet" d="M237,136 C218,160 184,178 166,208"/>
+    <path class="packet" d="M248,136 C310,158 350,178 394,214"/>
+
+    <circle class="bob" cx="400" cy="220" r="7"/>
+    <text class="small" x="292" y="204">Bob receives</text>
+    <text class="small" x="342" y="225">at 1010</text>
+    <path class="rollback" d="M400,238 C332,304 226,304 164,238"/>
+    <text class="label" x="192" y="322">rollback to 1004, replay</text>
+  </g>
+</svg>
