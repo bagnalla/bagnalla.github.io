@@ -13,12 +13,12 @@
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Equal Ping for All</title>
-    <meta name="description" content="Personal site and blog of Alex Bagnall.">
+    <meta name="description" content="A technical explanation of Armagetron's ping charity system, rollback netcode, and negative input delay.">
     <link rel="canonical" href="https://bagnalla.github.io/posts/ping-charity.html" />
     <meta property="og:site_name" content="Alex Bagnall" />
     <meta property="og:title" content="Equal Ping for All" />
-    <meta property="og:description" content="Personal site and blog of Alex Bagnall." />
-    <meta property="og:type" content="website" />
+    <meta property="og:description" content="A technical explanation of Armagetron's ping charity system, rollback netcode, and negative input delay." />
+    <meta property="og:type" content="article" />
     <meta property="og:url" content="https://bagnalla.github.io/posts/ping-charity.html" />
     
     
@@ -42,7 +42,7 @@
     <main role="main">
       <article class="ping-charity">
     <section class="header">
-        Posted on May  4, 2026
+        Posted on May 4, 2026
         
     </section>
     <section>
@@ -212,8 +212,8 @@ Tony Cannon, <cite><a href="https://drive.google.com/file/d/1cV0fY8e_SC1hIFF5E1r
 </footer>
 </blockquote>
 <h1 id="armagetron-in-the-browser">Armagetron in the Browser</h1>
-<p>This investigation of ping charity is part of a broader side project of mine to create an Armagetron clone for the web. Previous attempts to put Armagetron in the browser have largely failed when it came to netcode, because 1) it’s difficult and 2) web browsers notably do not support raw UDP sockets, so you can’t just port Armagetron’s netcode and expect it to work the same.</p>
-<p>I haven’t chosen a name yet, so we’ll just call it Webtron for now. It’s a full rewrite in TypeScript.<a href="#fn7" class="footnote-ref" id="fnref7" role="doc-noteref"><sup>7</sup></a> The core physics and gameplay systems are based on Armagetron’s code, but the networking model is totally different. It uses an event history model, with a fully deterministic simulation implemented as a discrete tick step function parameterized by the events for that tick. Clients propose input events to be added to the history at a scheduled tick. The server accepts or postpones them as needed and broadcasts the authoritative history of events to all clients. When a new client joins (or a resync is requested), it is given a snapshot of the state and all the events up to the present tick so it can sync up.</p>
+<p>This investigation of ping charity is part of a broader side project of mine to create an Armagetron clone for the web. Previous attempts to put Armagetron in the browser have largely failed when it came to netcode, because 1) it’s difficult and 2) web browsers don’t support raw UDP sockets, so you can’t just port Armagetron’s netcode and expect it to work the same.</p>
+<p>I haven’t chosen a name yet, so we’ll just call it Webtron for now. It’s a full rewrite in TypeScript.<a href="#fn7" class="footnote-ref" id="fnref7" role="doc-noteref"><sup>7</sup></a> The core physics and gameplay systems are based on Armagetron’s code, but the netcode is totally different. It uses an event history model, with a fully deterministic simulation implemented as a discrete tick step function parameterized by the events for that tick. Clients propose input events to be added to the history at a scheduled tick. The server accepts or postpones them as needed and broadcasts the authoritative history of events to all clients. When a new client joins (or a resync is requested), it is given a snapshot of the state and all the events up to the present tick so it can sync up.</p>
 <p>The current implementation is basically a netcode tech demo. There’s a single live instance <a href="https://dogfight.fly.dev/play?mode=online">here</a> running on a cheap server in Chicago. Occasionally the server is a bit unstable.</p>
 <p>The event history model with deterministic simulation is cool because it enables proper rollback of the entire game state, which means, among other things, that it supports ping charity without any limitations or weird edge cases.</p>
 <figure>
@@ -293,7 +293,7 @@ Negative input delay is local history rewriting: move the input timestamp back, 
 
     <footer>
       Site built with
-      <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+      <a href="https://jaspervdj.be/hakyll">Hakyll</a>
     </footer>
   </body>
 </html>
