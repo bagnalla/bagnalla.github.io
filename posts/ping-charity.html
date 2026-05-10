@@ -212,9 +212,9 @@ Tony Cannon, <cite><a href="https://drive.google.com/file/d/1cV0fY8e_SC1hIFF5E1r
 </footer>
 </blockquote>
 <h1 id="armagetron-in-the-browser">Armagetron in the Browser</h1>
-<p>This investigation of ping charity is part of a broader side project of mine to create an Armagetron clone for the web. Previous attempts to put Armagetron in the browser have largely failed when it came to netcode, because 1) it’s difficult and 2) web browsers don’t support raw UDP sockets, so you can’t just port Armagetron’s netcode and expect it to work the same.</p>
-<p>I haven’t chosen a name yet, so we’ll just call it Webtron for now. It’s a full rewrite in TypeScript.<a href="#fn7" class="footnote-ref" id="fnref7" role="doc-noteref"><sup>7</sup></a> The core physics and gameplay systems are based on Armagetron’s code, but the netcode is totally different. It uses an event history model, with a fully deterministic simulation implemented as a discrete tick step function parameterized by the events for that tick. Clients propose input events to be added to the history at a scheduled tick. The server accepts or postpones them as needed and broadcasts the authoritative history of events to all clients. When a new client joins (or a resync is requested), it is given a snapshot of the state and all the events up to the present tick so it can sync up.</p>
-<p>The current implementation is basically a netcode tech demo. There’s a single live instance <a href="https://dogfight.fly.dev/play?mode=online">here</a> running on a cheap server in Chicago.</p>
+<p>This investigation of ping charity is part of a broader side project of mine to create an Armagetron clone for the web. I haven’t chosen a name yet, so let’s just call it Webtron. Previous attempts to put Armagetron in the browser have largely failed when it came to netcode, because 1) it’s difficult and 2) web browsers don’t support raw UDP sockets, so you can’t just port Armagetron’s netcode and expect it to work the same.</p>
+<p>Webtron is a full rewrite in TypeScript.<a href="#fn7" class="footnote-ref" id="fnref7" role="doc-noteref"><sup>7</sup></a> The core physics and gameplay systems are based on Armagetron, but the netcode is totally different. It uses an event history model, with a fully deterministic simulation implemented as a discrete tick step function parameterized by the input events for that tick. Clients propose events to be added to the history at a scheduled tick. The server accepts or postpones them as needed and broadcasts the authoritative history of events to all clients. When a new client joins (or a resync is requested), it is given a snapshot of the state and all the events up to the present tick so that it can sync up.</p>
+<p>The current implementation is basically just a netcode tech demo. There’s a single live instance <a href="https://dogfight.fly.dev/play?mode=online">here</a> running on a cheap server in Chicago.</p>
 <p>The event history model with deterministic simulation is cool because it enables proper rollback of the entire game state, which means, among other things, that it supports ping charity without any limitations or weird edge cases.</p>
 <figure>
 <img src="../images/ping-charity/event-history-rollback.svg" alt="Three timelines for Alice, the server, and Bob showing a late event inserted into a rewritable history window.">
@@ -222,7 +222,7 @@ Tony Cannon, <cite><a href="https://drive.google.com/file/d/1cV0fY8e_SC1hIFF5E1r
 Webtron makes the history-rewriting model explicit: events are inserted into recent history, then the affected simulation is replayed.
 </figcaption>
 </figure>
-<p>Ping charity in Webtron works essentially the same as in Armagetron. It continuously rewrites history on the fly to accommodate high-ping clients, who purposely desync their clocks to take advantage of it.</p>
+<p>Ping charity in Webtron works essentially the same as in Armagetron. The server continuously rewrites history on the fly to accommodate high-ping clients, who purposely shift their clock alignment to take advantage of it.</p>
 <p>History rewriting is a powerful tool. It’s fun to speculate how it might be useful in other interesting ways. I have found one thing: a purely client-side optimization that uses local history rewriting to enhance responsiveness of controls.</p>
 <h1 id="negative-input-delay">Negative Input Delay</h1>
 <p>Input latency is not just one-way latency from client to server, but also the local latency between when you press the key and when it gets processed by the client code. Typically this processing happens at a fixed rate, once per tick, so the latency can range anywhere from zero to a full tick duration depending on when during the tick’s lifetime you happen to press the input.</p>
@@ -235,7 +235,7 @@ Webtron makes the history-rewriting model explicit: events are inserted into rec
 Negative input delay is local history rewriting: move the input timestamp back, insert it, and replay.
 </figcaption>
 </figure>
-<p>I call this “mind reader” input processing because it’s as if the game knew ahead of time what you were going to press. Unlike rollback used to hide network latency, negative input delay usually does not produce perceptible visual artifacts, especially at high tick rates.</p>
+<p>Unlike rollback used to hide network latency, negative input delay usually does not produce perceptible visual artifacts, at least not at high tick rates.</p>
 <p>I haven’t seen this exact technique described elsewhere, but I have found some existing notions of “negative input latency”:</p>
 <ul>
 <li>A more coarse-grained mechanism for providing forgiveness for late inputs in rhythm games like Fortnite Festival, and</li>
@@ -246,7 +246,7 @@ Negative input delay is local history rewriting: move the input timestamp back, 
 <p>Stadia’s VP of Engineering proclaimed that the service would have negative latency. The buzzword itself implied some kind of physically impossible time travel, but the real explanation was more modest: “‘Negative latency’ is a concept by which Stadia can set up a game with a buffer of predicted latency between the server and player, and then use various methods to undercut it. It can run the game at a super-fast framerate so it can act on player inputs earlier, or it can predict a player’s button presses.”</p>
 </blockquote>
 <p>“Physically impossible time travel”, hah! With rollback, time travel <em>is</em> possible. :)</p>
-<p>The result of all this (negative input delay and server-side rollback-based lag compensation with ping charity) is a freakishly responsive gameplay experience in the browser that feels somewhat magical. Work on the implementation has stalled as I’ve gotten busy and interested in other things. There’s a similar project <a href="https://www.cyclearena.io/">here</a> that appears to have working netcode, but I don’t think it implements any of the ideas described here.</p>
+<p>The result of all this (negative input delay and server-side rollback-based lag compensation with ping charity) is a freakishly responsive gameplay experience in the browser that feels somewhat magical. Work on the implementation has stalled as I’ve gotten busy and interested in other things. There’s a similar project <a href="https://www.cyclearena.io/">here</a> that appears to have working netcode, but I don’t think it implements the ideas described here.</p>
 <h1 id="appendix">Appendix</h1>
 <h2 id="rollback-frame-advantage">Rollback netcode and frame advantage</h2>
 <p>The <a href="https://www.ggpo.net/">GGPO</a> SDK implements rollback networking for peer-to-peer games. In that setting there is no single authoritative server clock, but if the peers are not properly synchronized with one another one side can benefit more from rollback than the other. GGPO calls this imbalance “frame advantage.” <a href="https://drive.google.com/file/d/1cV0fY8e_SC1hIFF5E1rT8XRVRzPjU8W9/view">This excellent article</a> explains:</p>
