@@ -91,7 +91,7 @@ In short, if you have low ping and your opponent has high ping (ping: the time i
 <p>Armagetron is open source. All of its code is available in <a href="https://gitlab.com/armagetronad/armagetronad">a public repo</a>. It should be straightforward to figure out what’s going on by just looking at the code. So why hasn’t anyone already done that? My guess is because 1) the code is old, confusing, and sparsely documented,<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a> and 2) the feature itself is counterintuitive. There isn’t just one section of code that implements ping charity; it arises from complementary modifications to two separate mechanisms that already exist for other purposes.<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a> The interaction between them is subtle, and it is completely undocumented (which from Z-Man’s old quote “I rather keep the secret buried in the source code” appears to be a deliberate choice).</p>
 <h1 id="preliminaries">Preliminaries</h1>
 <p>Armagetron uses a client-server architecture. The server runs the full simulation, and its version of events is authoritative. Clients send movement commands, receive other players’ commands and periodic state updates (and possibly corrections to their own commands) from the server, and run their own copy of the simulation locally for client-side prediction.</p>
-<p>Latency has two dimensions:</p>
+<p>Latency has two directions:</p>
 <ol type="1">
 <li><strong>Client to server</strong>: how long it takes for the client’s input commands to reach the authoritative sim.</li>
 <li><strong>Server to client</strong>: how long it takes for updates about the world (e.g., other players’ actions) to reach the client.</li>
